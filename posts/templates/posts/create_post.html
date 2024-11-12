@@ -1,0 +1,17 @@
+<!-- posts/create_post.html -->
+<h2>Create a Post</h2>
+<form method="post">
+    {% csrf_token %}
+    <textarea name="content" rows="5" placeholder="What's on your mind?" required></textarea>
+    <button type="submit">Post</button>
+</form>
+
+{% if messages %}
+    <ul>
+        {% for message in messages %}
+            <li>{{ message }}</li>
+        {% endfor %}
+    </ul>
+{% endif %}
+
+

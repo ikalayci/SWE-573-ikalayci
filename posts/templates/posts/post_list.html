@@ -1,0 +1,60 @@
+<!-- posts/post_list.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Post List</title>
+</head>
+<body>
+
+<h2>Posts</h2>
+
+{% if user.is_authenticated %}
+    <p>Welcome, {{ user.username }}!</p>
+    <a href="{% url 'logout' %}">Logout</a>
+    <a href="{% url 'create_post' %}">Add Post</a>
+{% else %}
+    <a href="{% url 'login' %}">Login</a>
+    <a href="{% url 'register' %}">Register</a>
+{% endif %}
+
+{% for post in posts %}
+    <div>
+        <strong>{{ post.user.username }}</strong>
+        <p>{{ post.content }}</p>
+        <small>Posted on {{ post.created_at }}</small>
+
+        <h4>Comments:</h4>
+        {% for comment in post.comments.all %}
+            <div style="margin-left: 20px;">
+                <p>
+                    <strong>
+                        {% if comment.user %}
+                            {{ comment.user.username }}
+                        {% else %}
+                            Anonymous
+                        {% endif %}
+                    </strong>: {{ comment.content }}
+                </p>
+                <small>Commented on {{ comment.created_at }}</small>
+            </div>
+        {% empty %}
+            <p style="margin-left: 20px;">No comments yet.</p>
+        {% endfor %}
+
+        <form action="{% url 'add_comment' post.id %}" method="post" style="margin-top: 10px;">
+            {% csrf_token %}
+            <textarea name="content" rows="2" placeholder="Add a comment..." required></textarea>
+            <button type="submit">Comment</button>
+        </form>
+    </div>
+    <hr>
+{% empty %}
+    <p>No posts yet. Be the first to <a href="{% url 'create_post' %}">create one</a>!</p>
+{% endfor %}
+
+</body>
+</html>
+
+
