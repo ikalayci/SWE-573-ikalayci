@@ -1,12 +1,71 @@
-<form method="post">
+<h2>Login</h2>
+
+<form method="post" action="{% url 'login' %}">
     {% csrf_token %}
-    <label for="username">Username:</label>
-    <input type="text" name="username" id="username" required>
-    
-    <label for="password">Password:</label>
-    <input type="password" name="password" id="password" required>
-    
-    <button type="submit">Login</button>
+
+    <div class="input-container">
+        <label for="username">Username:</label>
+        <input type="text" name="username" id="username" required>
+    </div>
+
+    <div class="input-container">
+        <label for="password">Password:</label>
+        <input type="password" name="password" id="password" required>
+    </div>
+
+    <button type="submit" class="button main-button">Login</button>
+    <a href="{% url 'home' %}" class="button cancel-button">Cancel</a>
 </form>
+
+
+
+<style>
+    .input-container {
+        display: flex;
+        flex-direction: column;
+        margin-bottom: 15px;
+    }
+
+    .input-container label {
+        font-size: 16px;
+        margin-bottom: 5px;
+    }
+
+    .input-container input {
+        padding: 8px;
+        font-size: 16px;
+        width: 100%;
+        max-width: 300px;
+    }
+
+    /* Button styles */
+    .button {
+        display: inline-block;
+        padding: 8px 16px;
+        margin-top: 10px;
+        font-size: 16px;
+        color: #fff;
+        border: none;
+        border-radius: 4px;
+        text-decoration: none;
+        cursor: pointer;
+    }
+
+    .button.main-button {
+        background-color: #6c757d;
+    }
+
+    .button.main-button:hover {
+        background-color: #5a6268;
+    }
+
+    .button.cancel-button {
+        background-color: #d9534f;
+    }
+
+    .button.cancel-button:hover {
+        background-color: #c9302c;
+    }
+</style>
 
 

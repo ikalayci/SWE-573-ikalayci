@@ -1,10 +1,32 @@
-<!-- posts/create_post.html -->
 <h2>Create a Post</h2>
-<form method="post">
+
+<form method="post" enctype="multipart/form-data">
     {% csrf_token %}
-    <textarea name="content" rows="5" placeholder="What's on your mind?" required></textarea>
-    <button type="submit">Post</button>
+
+    <!-- Textbox for post content -->
+    <div>
+        <textarea name="content" rows="5" placeholder="What's on your mind?" required></textarea>
+    </div>
+
+    <!-- Upload picture button located under the textbox -->
+    <div style="margin-top: 10px;">
+        <input type="file" name="image" id="imageInput" accept="image/*" style="display: none;" required>
+        <button type="button" class="button main-button" onclick="document.getElementById('imageInput').click()">Upload a Picture</button>
+    </div>
+
+    <!-- Section to add multiple tags -->
+    <div id="tag-container" style="margin-top: 10px;">
+        <label for="tags">Tags:</label>
+        <div id="tag-inputs"></div>
+        <button type="button" class="button main-button" onclick="addTagInput()">Add Tags</button>
+    </div>
+
+    <!-- Submit and Cancel buttons -->
+    <button type="submit" class="button main-button" style="margin-top: 10px;">Post</button>
+    <a href="{% url 'post_list' %}" class="button cancel-button">Cancel</a>
 </form>
+
+
 
 {% if messages %}
     <ul>
@@ -14,4 +36,47 @@
     </ul>
 {% endif %}
 
+<style>
+    /* Common button styles */
+    .button {
+        display: inline-block;
+        padding: 8px 16px;
+        margin-top: 10px;
+        font-size: 16px;
+        color: #fff;
+        border: none;
+        border-radius: 4px;
+        text-decoration: none;
+        cursor: pointer;
+    }
 
+    /* Grey button for main actions (e.g., Post, Add Tag) */
+    .button.main-button {
+        background-color: #6c757d;  /* Grey color */
+    }
+
+    .button.main-button:hover {
+        background-color: #5a6268; /* Darker grey on hover */
+    }
+
+    /* Red button specifically for cancel actions */
+    .button.cancel-button {
+        background-color: #d9534f;  /* Red color */
+    }
+
+    .button.cancel-button:hover {
+        background-color: #c9302c; /* Darker red on hover */
+    }
+</style>
+
+
+<script>
+    function addTagInput() {
+        const tagInputs = document.getElementById("tag-inputs");
+        const newTagInput = document.createElement("input");
+        newTagInput.type = "text";
+        newTagInput.name = "tags";
+        newTagInput.placeholder = "Enter a tag";
+        tagInputs.appendChild(newTagInput);
+    }
+</script>

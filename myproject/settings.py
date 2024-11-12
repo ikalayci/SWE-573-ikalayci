@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
+import os
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -124,4 +126,8 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 LOGIN_REDIRECT_URL = 'home'  # Change 'home' to your preferred redirect page
 LOGOUT_REDIRECT_URL = 'home'
 
+# settings.py 
+# this code is to create and direct to media files for pictures
+MEDIA_URL = '/media/' # The URL path to access media files.
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media') # The location on the file system to store uploaded media files.
 
