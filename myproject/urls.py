@@ -16,12 +16,13 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from accounts import views as ibrahim
+from accounts import views as account_views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/', include('accounts.urls')),
     path('posts/', include('posts.urls')),  # Include posts app URLs
     path('', include('posts.urls')),  # Set post_list as homepage if desired
+    path('', account_views.home, name='home'),  # Add home view for the root URL
 ]
 
