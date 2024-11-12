@@ -1,30 +1,51 @@
-<h2>Create a Post</h2>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create a Post</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body class="container my-4">
 
-<form method="post" enctype="multipart/form-data">
+<h2 class="text-center mb-4">Create a Post</h2>
+
+<form method="post" action="{% url 'create_post' %}" enctype="multipart/form-data" class="mx-auto" style="max-width: 600px;">
     {% csrf_token %}
 
     <!-- Textbox for post content -->
-    <div>
-        <textarea name="content" rows="5" placeholder="What's on your mind?" required></textarea>
+    <div class="form-group">
+        <textarea name="content" rows="5" placeholder="What's on your mind?" required class="form-control"></textarea>
     </div>
 
     <!-- Upload picture button located under the textbox -->
-    <div style="margin-top: 10px;">
+    <div class="form-group">
         <input type="file" name="image" id="imageInput" accept="image/*" style="display: none;" required>
-        <button type="button" class="button main-button" onclick="document.getElementById('imageInput').click()">Upload a Picture</button>
+        <button type="button" class="btn btn-secondary" onclick="document.getElementById('imageInput').click()">Upload a Picture</button>
     </div>
 
     <!-- Section to add multiple tags -->
-    <div id="tag-container" style="margin-top: 10px;">
+    <div class="form-group">
         <label for="tags">Tags:</label>
-        <div id="tag-inputs"></div>
-        <button type="button" class="button main-button" onclick="addTagInput()">Add Tags</button>
+        <div id="tag-container">
+            <div id="tag-inputs"></div>
+            <button type="button" class="btn btn-secondary mt-2" onclick="addTagInput()">Add Tag</button>
+        </div>
     </div>
 
     <!-- Submit and Cancel buttons -->
-    <button type="submit" class="button main-button" style="margin-top: 10px;">Post</button>
-    <a href="{% url 'post_list' %}" class="button cancel-button">Cancel</a>
+    <button type="submit" class="btn btn-secondary btn-block mt-3">Post</button>
+    <a href="{% url 'post_list' %}" class="btn btn-danger btn-block mt-2">Cancel</a>
 </form>
+
+<!-- Bootstrap JS and dependencies (optional) -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
+
 
 
 

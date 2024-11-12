@@ -1,23 +1,32 @@
-<h2>Login</h2>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body class="container my-4">
 
-<form method="post" action="{% url 'login' %}">
+<h2 class="text-center mb-4">Login</h2>
+
+<form method="post" action="{% url 'login' %}" class="mx-auto" style="max-width: 400px;">
     {% csrf_token %}
-
-    <div class="input-container">
+    
+    <div class="form-group">
         <label for="username">Username:</label>
-        <input type="text" name="username" id="username" required>
+        <input type="text" name="username" id="username" class="form-control" required>
     </div>
-
-    <div class="input-container">
+    
+    <div class="form-group">
         <label for="password">Password:</label>
-        <input type="password" name="password" id="password" required>
+        <input type="password" name="password" id="password" class="form-control" required>
     </div>
-
-    <button type="submit" class="button main-button">Login</button>
-    <a href="{% url 'home' %}" class="button cancel-button">Cancel</a>
+    
+    <button type="submit" class="btn btn-secondary btn-block mt-3">Login</button>
+    <a href="{% url 'home' %}" class="btn btn-danger btn-block mt-2">Cancel</a>
 </form>
-
-
 
 <style>
     .input-container {
@@ -68,4 +77,9 @@
     }
 </style>
 
-
+<!-- Bootstrap JS and dependencies (optional) -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
