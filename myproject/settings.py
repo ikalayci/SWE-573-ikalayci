@@ -76,10 +76,15 @@ WSGI_APPLICATION = 'myproject.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'my_django_db',        # Replace with your PostgreSQL database name
+        'USER': 'django_user',          # Replace with your PostgreSQL username
+        'PASSWORD': '929696',    # Replace with your PostgreSQL password
+        'HOST': 'localhost',            # Default for local development
+        'PORT': '5432',                 # Default PostgreSQL port
     }
 }
+
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
