@@ -3,3 +3,4 @@ __pycache__/
 *.pyc 
 db.sqlite3   # If you're using the default SQLite database
 *.log        # Ignore log files
+venv/
