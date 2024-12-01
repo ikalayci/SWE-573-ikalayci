@@ -1,0 +1,23 @@
+# Ignore virtual environments
+venv/
+.venv/
+
+# Ignore Python cache files
+__pycache__/
+*.pyc
+*.pyo
+
+# Ignore database files
+*.sqlite3
+
+# Ignore local media uploads
+media/
+
+# Ignore Git metadata
+.git/
+.gitignore
+
+# Ignore temporary files and logs
+*.log
+*.tmp
+

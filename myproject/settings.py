@@ -26,7 +26,12 @@ SECRET_KEY = 'django-insecure-2*j)8n0h-8rr@z2llbm^=qv6j-g9j10@$gv7bl@jv2-v$7#_gx
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+SECURE_SSL_REDIRECT = False  # This should be False in development
+SECURE_HTTP_ONLY = False  # Set this to False for local development
+
+
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
+
 
 # Application definition
 
@@ -135,4 +140,8 @@ LOGOUT_REDIRECT_URL = 'home'
 # this code is to create and direct to media files for pictures
 MEDIA_URL = '/media/' # The URL path to access media files.
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media') # The location on the file system to store uploaded media files.
+print(MEDIA_ROOT)  # Print MEDIA_ROOT to confirm its value.
 
+STATIC_URL = '/static/'
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')

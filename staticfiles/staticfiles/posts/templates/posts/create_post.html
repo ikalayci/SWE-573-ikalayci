@@ -1,0 +1,53 @@
+{% extends "posts/base.html" %}
+
+{% block content %}
+<h2 class="text-center mb-4">Create a Post</h2>
+
+<form method="post" action="{% url 'create_post' %}" enctype="multipart/form-data" class="mx-auto" style="max-width: 600px;">
+    {% csrf_token %}
+
+    <!-- Textbox for post content -->
+    <div class="form-group">
+        <textarea name="content" rows="5" placeholder="What's on your mind?" required class="form-control"></textarea>
+    </div>
+
+    <!-- Upload picture button located under the textbox -->
+    <div class="form-group">
+        <input type="file" name="image" id="imageInput" accept="image/*" style="display: none;" required>
+        <button type="button" class="btn btn-secondary" onclick="document.getElementById('imageInput').click()">Upload a Picture</button>
+    </div>
+
+    <!-- Section to add multiple tags -->
+    <div class="form-group">
+        <label for="tags">Tags:</label>
+        <div id="tag-container">
+            <div id="tag-inputs"></div>
+            <button type="button" class="btn btn-secondary mt-2" onclick="addTagInput()">Add Tag</button>
+        </div>
+    </div>
+
+    <!-- Submit and Cancel buttons -->
+    <button type="submit" class="btn btn-secondary btn-block mt-3">Post</button>
+    <a href="{% url 'post_list' %}" class="btn btn-danger btn-block mt-2">Cancel</a>
+</form>
+
+<!-- Display Django messages -->
+{% if messages %}
+    <ul>
+        {% for message in messages %}
+            <li>{{ message }}</li>
+        {% endfor %}
+    </ul>
+{% endif %}
+{% endblock %}
+
+<script>
+    function addTagInput() {
+        const tagInputs = document.getElementById("tag-inputs");
+        const newTagInput = document.createElement("input");
+        newTagInput.type = "text";
+        newTagInput.name = "tags";
+        newTagInput.placeholder = "Enter a tag";
+        tagInputs.appendChild(newTagInput);
+    }
+</script>

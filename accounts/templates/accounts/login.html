@@ -1,85 +1,25 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-</head>
-<body class="container my-4">
+{% extends "posts/base.html" %}
 
+{% block content %}
 <h2 class="text-center mb-4">Login</h2>
 
 <form method="post" action="{% url 'login' %}" class="mx-auto" style="max-width: 400px;">
     {% csrf_token %}
-    
+
     <div class="form-group">
         <label for="username">Username:</label>
         <input type="text" name="username" id="username" class="form-control" required>
     </div>
-    
+
     <div class="form-group">
         <label for="password">Password:</label>
         <input type="password" name="password" id="password" class="form-control" required>
     </div>
-    
-    <button type="submit" class="btn btn-secondary btn-block mt-3">Login</button>
-    <a href="{% url 'home' %}" class="btn btn-danger btn-block mt-2">Cancel</a>
+
+    <!-- Buttons aligned side by side with reduced spacing -->
+    <div class="form-group d-flex justify-content-start mt-3" style="gap: 5px;">
+        <button type="submit" class="btn btn-secondary">Login</button>
+        <a href="{% url 'post_list' %}" class="btn btn-danger">Cancel</a>
+    </div>
 </form>
-
-<style>
-    .input-container {
-        display: flex;
-        flex-direction: column;
-        margin-bottom: 15px;
-    }
-
-    .input-container label {
-        font-size: 16px;
-        margin-bottom: 5px;
-    }
-
-    .input-container input {
-        padding: 8px;
-        font-size: 16px;
-        width: 100%;
-        max-width: 300px;
-    }
-
-    /* Button styles */
-    .button {
-        display: inline-block;
-        padding: 8px 16px;
-        margin-top: 10px;
-        font-size: 16px;
-        color: #fff;
-        border: none;
-        border-radius: 4px;
-        text-decoration: none;
-        cursor: pointer;
-    }
-
-    .button.main-button {
-        background-color: #6c757d;
-    }
-
-    .button.main-button:hover {
-        background-color: #5a6268;
-    }
-
-    .button.cancel-button {
-        background-color: #d9534f;
-    }
-
-    .button.cancel-button:hover {
-        background-color: #c9302c;
-    }
-</style>
-
-<!-- Bootstrap JS and dependencies (optional) -->
-<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-</body>
-</html>
+{% endblock %}

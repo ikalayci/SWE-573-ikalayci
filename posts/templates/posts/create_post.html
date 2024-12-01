@@ -1,14 +1,6 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create a Post</title>
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-</head>
-<body class="container my-4">
+{% extends "posts/base.html" %}
 
+{% block content %}
 <h2 class="text-center mb-4">Create a Post</h2>
 
 <form method="post" action="{% url 'create_post' %}" enctype="multipart/form-data" class="mx-auto" style="max-width: 600px;">
@@ -39,16 +31,7 @@
     <a href="{% url 'post_list' %}" class="btn btn-danger btn-block mt-2">Cancel</a>
 </form>
 
-<!-- Bootstrap JS and dependencies (optional) -->
-<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-</body>
-</html>
-
-
-
-
+<!-- Display Django messages -->
 {% if messages %}
     <ul>
         {% for message in messages %}
@@ -56,40 +39,7 @@
         {% endfor %}
     </ul>
 {% endif %}
-
-<style>
-    /* Common button styles */
-    .button {
-        display: inline-block;
-        padding: 8px 16px;
-        margin-top: 10px;
-        font-size: 16px;
-        color: #fff;
-        border: none;
-        border-radius: 4px;
-        text-decoration: none;
-        cursor: pointer;
-    }
-
-    /* Grey button for main actions (e.g., Post, Add Tag) */
-    .button.main-button {
-        background-color: #6c757d;  /* Grey color */
-    }
-
-    .button.main-button:hover {
-        background-color: #5a6268; /* Darker grey on hover */
-    }
-
-    /* Red button specifically for cancel actions */
-    .button.cancel-button {
-        background-color: #d9534f;  /* Red color */
-    }
-
-    .button.cancel-button:hover {
-        background-color: #c9302c; /* Darker red on hover */
-    }
-</style>
-
+{% endblock %}
 
 <script>
     function addTagInput() {

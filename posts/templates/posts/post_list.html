@@ -1,17 +1,9 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SnapTrace.com</title>
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-</head>
-<body class="container my-4">
+{% extends "posts/base.html" %}
 
-<h2 class="text-center mb-4">SnapTrace.com</h2>
+{% block content %}
+<h2 class="text-center mb-4">Mysterious Objects</h2>
 
-<!-- Display login/logout/register options based on user's authentication status -->
+<!-- Display Add Post button -->
 <div class="d-flex justify-content-between mb-3">
     <!-- Left-aligned Add Post button -->
     <div>
@@ -19,20 +11,7 @@
             <a href="{% url 'create_post' %}" class="btn btn-secondary">Add Post</a>
         {% endif %}
     </div>
-
-    <!-- Right-aligned welcome text and login/logout/register buttons -->
-    <div class="d-flex justify-content-end align-items-center">
-        {% if user.is_authenticated %}
-            <p class="mb-0 mr-3">Welcome, {{ user.username }}!</p>
-            <a href="{% url 'logout' %}" class="btn btn-danger ml-2">Logout</a>
-        {% else %}
-            <a href="{% url 'login' %}" class="btn btn-secondary ml-2">Login</a>
-            <a href="{% url 'register' %}" class="btn btn-secondary ml-2">Register</a>
-        {% endif %}
-    </div>
 </div>
-
-
 
 {% for post in posts %}
     <div class="card mb-4">
@@ -108,10 +87,4 @@
         object-position: center;
     }
 </style>
-
-<!-- Bootstrap JS and dependencies (optional) -->
-<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-</body>
-</html>
+{% endblock %}
