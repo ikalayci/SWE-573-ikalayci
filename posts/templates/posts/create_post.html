@@ -1,53 +1,294 @@
 {% extends "posts/base.html" %}
-
 {% block content %}
-<h2 class="text-center mb-4">Create a Post</h2>
+<div class="container mt-4">
+    <h2 class="text-center mb-4">Create a Post!</h2>
 
-<form method="post" action="{% url 'create_post' %}" enctype="multipart/form-data" class="mx-auto" style="max-width: 600px;">
-    {% csrf_token %}
+    <form method="POST" enctype="multipart/form-data" action="{% url 'create_post' %}">
+        {% csrf_token %}
 
-    <!-- Textbox for post content -->
-    <div class="form-group">
-        <textarea name="content" rows="5" placeholder="What's on your mind?" required class="form-control"></textarea>
-    </div>
-
-    <!-- Upload picture button located under the textbox -->
-    <div class="form-group">
-        <input type="file" name="image" id="imageInput" accept="image/*" style="display: none;" required>
-        <button type="button" class="btn btn-secondary" onclick="document.getElementById('imageInput').click()">Upload a Picture</button>
-    </div>
-
-    <!-- Section to add multiple tags -->
-    <div class="form-group">
-        <label for="tags">Tags:</label>
-        <div id="tag-container">
-            <div id="tag-inputs"></div>
-            <button type="button" class="btn btn-secondary mt-2" onclick="addTagInput()">Add Tag</button>
+        <!-- Title -->
+        <div class="mb-3" style="width: 1250px;">
+            
+            <input 
+                type="text" 
+                name="title" 
+                class="form-control" 
+                placeholder="Enter the title of your post" 
+                required 
+                style="border: 2px solid #ccc; border-radius: 10px; padding: 10px; font-size: 16px; width: 100%;">
         </div>
-    </div>
 
-    <!-- Submit and Cancel buttons -->
-    <button type="submit" class="btn btn-secondary btn-block mt-3">Post</button>
-    <a href="{% url 'post_list' %}" class="btn btn-danger btn-block mt-2">Cancel</a>
-</form>
+        <!-- Wrappers Side by Side -->
+        <div class="d-flex justify-content-start">
+            <!-- Image Upload Wrapper -->
+            <div class="border p-3 me-4" 
+                style="border: 2px solid #ccc; width: 615px; border-radius: 15px; background-color: #fff;">
+                <h2 class="text-center mb-4" style="font-size: 18px;">Upload a Picture!</h2>
 
-<!-- Display Django messages -->
-{% if messages %}
-    <ul>
-        {% for message in messages %}
-            <li>{{ message }}</li>
-        {% endfor %}
-    </ul>
-{% endif %}
-{% endblock %}
+                <!-- Image Preview Frame -->
+                <div id="image-preview-frame" class="border mb-3" 
+                    style="width: 583px; height: 350px; background-color: #f8f9fa; overflow: hidden; position: relative; border-radius: 15px; display: flex; justify-content: center; align-items: center; padding: 10px;">
+                    <img id="image-preview" src="" alt="Preview" 
+                        style="max-width: 100%; max-height: 100%; display: none; border-radius: 15px; object-fit: contain;">
+                    <p id="no-image-text" class="text-muted" style="text-align: center; margin: 0;">No Image</p>
+                </div>
+
+                <!-- Browse and File Upload -->
+                <div class="mb-3">
+                    <!-- Hidden File Input -->
+                    <input 
+                        type="file" 
+                        id="image-input" 
+                        name="image" 
+                        class="form-control d-none" 
+                        accept="image/*" 
+                        onchange="handleFileSelect(event)">
+
+                    <!-- Custom Button and File Name Container -->
+                    <div class="d-flex align-items-center">
+                        <!-- Browse Button -->
+                        <button 
+                            type="button" 
+                            class="btn btn-secondary me-3" 
+                            onclick="document.getElementById('image-input').click();">
+                            Browse
+                        </button>
+
+                        <!-- File Name Container -->
+                        <input 
+                            type="text" 
+                            id="file-name-container" 
+                            class="form-control" 
+                            placeholder="No file selected" 
+                            readonly 
+                            style="border: 2px solid #ccc; border-radius: 10px; padding: 10px; font-size: 14px;">
+                    </div>
+                </div>
+
+            </div>
+            
+            <!-- Story Wrapper -->
+            <div class="border p-3 me-4" 
+                style="border: 2px solid #ccc; width: 615px; border-radius: 15px; background-color: #fff;">
+                <h2 class="text-center mb-4" style="font-size: 18px;">Story Of the Object!</h2>
+
+                <!-- Content -->
+                <div class="mb-3">
+                    <textarea 
+                        name="content" 
+                        class="form-control" 
+                        placeholder="Write your story here..."
+                        style="border: 2px solid #ccc; border-radius: 10px; width: 100%; height: 400px; padding: 10px; font-size: 16px;" 
+                        required></textarea>
+                </div>
+            </div>
+        </div>
+        <!-- Wrappers Side by Side -->
+        <div class="d-flex justify-content-start">
+            <!-- Tags Wrapper -->
+            <div class="border p-3 mb-4" 
+                style="border: 2px solid #ccc; border-radius: 15px; background-color: #fff; margin-top: 20px; width: 615px;">
+                <h2 class="text-center mb-3" style="font-size: 18px;">Do you want to add tags to your post?</h2>
+                <!-- Input Field for Tags -->
+                <div class="d-flex align-items-center mb-3">
+                    <input 
+                        type="text" 
+                        id="additional-info" 
+                        name="additional_info" 
+                        class="form-control me-3" 
+                        placeholder="Enter additional details (if any)" 
+                        style="border: 2px solid #ccc; border-radius: 10px; padding: 10px; font-size: 12px; width: 481px;"
+                        oninput="fetchWikidataSuggestions(this.value)"
+                    >
+                    <!-- Add Tag Button -->
+                    <button 
+                        type="button" 
+                        class="btn btn-primary" 
+                        onclick="addTag()">
+                        Add Tag
+                    </button>
+                </div>
+
+                <!-- Suggestions Container -->
+                <ul id="suggestions-list" class="list-group mt-2" 
+                    style="position: absolute; z-index: 1000; width: 481px; max-height: calc(3 * 5em); overflow-y: auto;">  
+                </ul>
+
+                <!-- Tags Container -->
+                <div id="tags-container" class="mt-3">
+                    <!-- Buttons for added tags will appear here -->
+                </div>
+                <!-- Hidden input to store tags -->
+                <input type="hidden" name="tags" id="hidden-tags" value="">
+
+
+            </div>
+
+            <div class="border p-3 mb-4" 
+            style="border: 2px solid #ccc; border-radius: 15px; background-color: #fff; margin-top: 20px; margin-left: 20px; width: 615px;">
+            <h2 class="text-center mb-3" style="font-size: 18px;">Do you want to add tags to your post?</h2>
+            </div>
+        </div>
+
+        <!-- Post and Cancel Buttons -->
+        <div class="text-end mt-4"style="width: 1250px;">
+            <button type="submit" name="post" class="btn btn-success">Post</button>
+            <button type="submit" name="cancel" class="btn btn-danger">Cancel</button>
+        </div>
+    </form>
+</div>
 
 <script>
-    function addTagInput() {
-        const tagInputs = document.getElementById("tag-inputs");
-        const newTagInput = document.createElement("input");
-        newTagInput.type = "text";
-        newTagInput.name = "tags";
-        newTagInput.placeholder = "Enter a tag";
-        tagInputs.appendChild(newTagInput);
+    function handleFileSelect(event) {
+        const file = event.target.files[0];
+        const preview = document.getElementById('image-preview');
+        const noImageText = document.getElementById('no-image-text');
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                preview.src = e.target.result;
+                preview.style.display = 'block';
+                noImageText.style.display = 'none';
+            };
+            reader.readAsDataURL(file);
+        } else {
+            preview.src = '';
+            preview.style.display = 'none';
+            noImageText.style.display = 'block';
+        }
     }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const imageInput = document.getElementById('image-input');
+        const fileNameContainer = document.getElementById('file-name-container');
+
+        // Set a default placeholder for the file name container
+        fileNameContainer.value = "No file selected";
+
+        // Function to handle file selection
+        imageInput.addEventListener('change', function () {
+            const file = imageInput.files[0];
+            if (file) {
+                // Display selected file name
+                fileNameContainer.value = file.name;
+            } else {
+                // Reset to default text if no file is selected
+                fileNameContainer.value = "No file selected";
+            }
+        });
+    });
+
+    function fetchWikidataSuggestions(query) {
+    const suggestionsList = document.getElementById('suggestions-list');
+    suggestionsList.innerHTML = ''; // Clear previous suggestions
+
+    if (!query.trim()) {
+        suggestionsList.style.display = 'none';
+        return;
+    }
+
+    const apiUrl = `https://www.wikidata.org/w/api.php?action=wbsearchentities&search=${encodeURIComponent(query)}&language=en&format=json&origin=*`;
+
+    fetch(apiUrl)
+        .then(response => response.json())
+        .then(data => {
+            if (data.search && data.search.length > 0) {
+                suggestionsList.style.display = 'block';
+                data.search.forEach(item => {
+                    const suggestionItem = document.createElement('li');
+                    suggestionItem.className = 'list-group-item list-group-item-action';
+                    suggestionItem.textContent = item.label + (item.description ? ` - ${item.description}` : '');
+                    suggestionItem.onclick = () => selectSuggestion(item.label);
+                    suggestionsList.appendChild(suggestionItem);
+                });
+            } else {
+                suggestionsList.style.display = 'none';
+            }
+        })
+        .catch(error => console.error('Error fetching suggestions:', error));
+    }
+
+    function selectSuggestion(value) {
+        const inputField = document.getElementById('additional-info');
+        const suggestionsList = document.getElementById('suggestions-list');
+        inputField.value = value;
+        suggestionsList.style.display = 'none';
+    }
+
+    function addTag() {
+        const inputField = document.getElementById('additional-info');
+        const tagsContainer = document.getElementById('tags-container');
+        const hiddenTags = document.getElementById('hidden-tags');
+        const tagValue = inputField.value.trim();
+
+        if (!tagValue) {
+            alert("Please select or enter a tag first.");
+            return;
+        }
+
+        // Call the Wikidata API to get the URL for the selected tag
+        const apiUrl = `https://www.wikidata.org/w/api.php?action=wbsearchentities&search=${encodeURIComponent(tagValue)}&language=en&format=json&origin=*`;
+
+        fetch(apiUrl)
+            .then(response => response.json())
+            .then(data => {
+                if (data.search && data.search.length > 0) {
+                    const tagData = data.search[0];
+                    const tagLabel = tagData.label;
+
+                    // Create a wrapper for the tag and remove button
+                    const tagWrapper = document.createElement('div');
+                    tagWrapper.className = 'd-inline-block me-2 mb-2';
+
+                    // Create the tag button
+                    const tagButton = document.createElement('button');
+                    tagButton.className = 'btn btn-outline-primary';
+                    tagButton.textContent = `${tagLabel}`;
+                    tagButton.onclick = () => window.open(`https://www.wikidata.org/wiki/${tagData.id}`, '_blank');
+
+                    // Create the remove "X" button
+                    const removeButton = document.createElement('button');
+                    removeButton.className = 'btn btn-danger btn-sm ms-2';
+                    removeButton.textContent = 'X';
+                    removeButton.onclick = () => {
+                        tagsContainer.removeChild(tagWrapper);
+                        updateHiddenTags();
+                    };
+
+                    // Append the tag button and the remove button to the wrapper
+                    tagWrapper.appendChild(tagButton);
+                    tagWrapper.appendChild(removeButton);
+
+                    // Append the wrapper to the tags container
+                    tagsContainer.appendChild(tagWrapper);
+
+                    // Update the hidden tags input field
+                    updateHiddenTags();
+
+                    // Clear the input field
+                    inputField.value = '';
+                } else {
+                    alert("No valid Wikidata entry found for the tag.");
+                }
+            })
+            .catch(error => console.error('Error fetching tag details:', error));
+    }
+
+    // Update hidden tags input field
+    function updateHiddenTags() {
+        const tagsContainer = document.getElementById('tags-container');
+        const hiddenTags = document.getElementById('hidden-tags');
+        const tags = [];
+
+        tagsContainer.querySelectorAll('.btn-outline-primary').forEach(tagButton => {
+            tags.push(tagButton.textContent);
+        });
+
+        hiddenTags.value = tags.join(',');
+    }
+
+
+
+
 </script>
+{% endblock %}
