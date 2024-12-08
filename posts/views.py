@@ -13,12 +13,31 @@ def create_post(request):
         content = request.POST.get('content')
         image = request.FILES.get('image')
         tags = request.POST.get('tags', '')  # Tags from hidden input field
+        colors = request.POST.get('colors', '')  # Colors from hidden input field
+        length = request.POST.get('hidden_length')  # Retrieve the length value
+        width = request.POST.get('hidden_width')   # Retrieve the width value
+        height = request.POST.get('hidden_height') # Retrieve the height value
 
-        post = Post.objects.create(title=title, content=content, image=image, user=request.user)
-        tag_names = [tag.strip() for tag in tags.split(',')]
+        
+
+        post = Post.objects.create(
+            user=request.user,
+            title=title,
+            content=content,
+            length=length if length else None,
+            width=width if width else None,
+            height=height if height else None,
+            image=image,
+        )
+
+        # Save tags
+        tag_names = [tag.strip() for tag in tags.split(',') if tag.strip()]
         for tag_name in tag_names:
             tag, created = Tag.objects.get_or_create(name=tag_name)
             post.tags.add(tag)
+
+        # Save colors
+        post.colors = colors  # Assuming 'colors' is a field in the Post model
 
         post.save()
         return redirect('post_list')
@@ -28,9 +47,13 @@ def create_post(request):
 
 
 
+
 def post_list(request):
-    posts = Post.objects.all().order_by('-created_at')  # Order by newest first
+    posts = Post.objects.all().order_by('-created_at')
+    for post in posts:
+        post.split_colors = post.colors.split(',') if post.colors else []
     return render(request, 'posts/post_list.html', {'posts': posts})
+
 
 def add_comment(request, post_id):
     post = get_object_or_404(Post, id=post_id)

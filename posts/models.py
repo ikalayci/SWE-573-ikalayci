@@ -19,11 +19,16 @@ class Tag(models.Model):
 
 class Post(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    title = models.CharField(max_length=255, null=True, blank=True)  # Ensure title field exists
+    title = models.CharField(max_length=255, blank=True, null=True)
     content = models.TextField()
-    image = models.ImageField(upload_to='uploads/')
-    tags = models.ManyToManyField(Tag, blank=True)
+    image = models.ImageField(upload_to='uploads/', blank=True, null=True)
+    length = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
+    width = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
+    height = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    tags = models.ManyToManyField(Tag, blank=True)
+    colors = models.TextField(blank=True, null=True)  # Example: stores colors as a comma-separated string
 
     def __str__(self):
         return f"{self.title or 'No Title'} - {self.user.username}"

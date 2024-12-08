@@ -1,4 +1,5 @@
 {% extends "posts/base.html" %}
+{% load static %}
 {% block content %}
 <div class="container mt-4">
     <h2 class="text-center mb-4">Create a Post!</h2>
@@ -21,13 +22,13 @@
         <!-- Wrappers Side by Side -->
         <div class="d-flex justify-content-start">
             <!-- Image Upload Wrapper -->
-            <div class="border p-3 me-4" 
-                style="border: 2px solid #ccc; width: 615px; border-radius: 15px; background-color: #fff;">
+            <div class="border p-3" 
+                style="border: 2px solid #ccc; width: 620px; border-radius: 15px; background-color: #fff; margin-right: 10px;">
                 <h2 class="text-center mb-4" style="font-size: 18px;">Upload a Picture!</h2>
 
                 <!-- Image Preview Frame -->
                 <div id="image-preview-frame" class="border mb-3" 
-                    style="width: 583px; height: 350px; background-color: #f8f9fa; overflow: hidden; position: relative; border-radius: 15px; display: flex; justify-content: center; align-items: center; padding: 10px;">
+                    style="width: 588px; height: 450px; background-color: #f8f9fa; overflow: hidden; position: relative; border-radius: 15px; display: flex; justify-content: center; align-items: center; padding: 20px;">
                     <img id="image-preview" src="" alt="Preview" 
                         style="max-width: 100%; max-height: 100%; display: none; border-radius: 15px; object-fit: contain;">
                     <p id="no-image-text" class="text-muted" style="text-align: center; margin: 0;">No Image</p>
@@ -64,76 +65,190 @@
                             style="border: 2px solid #ccc; border-radius: 10px; padding: 10px; font-size: 14px;">
                     </div>
                 </div>
-
             </div>
-            
-            <!-- Story Wrapper -->
-            <div class="border p-3 me-4" 
-                style="border: 2px solid #ccc; width: 615px; border-radius: 15px; background-color: #fff;">
-                <h2 class="text-center mb-4" style="font-size: 18px;">Story Of the Object!</h2>
+            <div style="padding: 0px; margin: 0px;">
+                <!-- Story Wrapper -->
+                <div class="border p-3 me-4" 
+                    style="border: 2px solid #ccc; width: 620px; border-radius: 15px; background-color: #fff;">
+                    <h2 class="text-center mb-4" style="font-size: 18px;">Story Of the Object!</h2>
 
-                <!-- Content -->
-                <div class="mb-3">
-                    <textarea 
-                        name="content" 
-                        class="form-control" 
-                        placeholder="Write your story here..."
-                        style="border: 2px solid #ccc; border-radius: 10px; width: 100%; height: 400px; padding: 10px; font-size: 16px;" 
-                        required></textarea>
-                </div>
-            </div>
-        </div>
-        <!-- Wrappers Side by Side -->
-        <div class="d-flex justify-content-start">
-            <!-- Tags Wrapper -->
-            <div class="border p-3 mb-4" 
-                style="border: 2px solid #ccc; border-radius: 15px; background-color: #fff; margin-top: 20px; width: 615px;">
-                <h2 class="text-center mb-3" style="font-size: 18px;">Do you want to add tags to your post?</h2>
-                <!-- Input Field for Tags -->
-                <div class="d-flex align-items-center mb-3">
-                    <input 
-                        type="text" 
-                        id="additional-info" 
-                        name="additional_info" 
-                        class="form-control me-3" 
-                        placeholder="Enter additional details (if any)" 
-                        style="border: 2px solid #ccc; border-radius: 10px; padding: 10px; font-size: 12px; width: 481px;"
-                        oninput="fetchWikidataSuggestions(this.value)"
-                    >
-                    <!-- Add Tag Button -->
-                    <button 
-                        type="button" 
-                        class="btn btn-primary" 
-                        onclick="addTag()">
-                        Add Tag
-                    </button>
+                    <!-- Content -->
+                    <div class="mb-3">
+                        <textarea 
+                            name="content" 
+                            class="form-control" 
+                            placeholder="Write your story here..."
+                            style="border: 2px solid #ccc; border-radius: 10px; width: 100%; height: 300px; padding: 10px; font-size: 16px;" 
+                            required></textarea>
+                    </div>
                 </div>
 
-                <!-- Suggestions Container -->
-                <ul id="suggestions-list" class="list-group mt-2" 
-                    style="position: absolute; z-index: 1000; width: 481px; max-height: calc(3 * 5em); overflow-y: auto;">  
-                </ul>
+                <!-- Tags Wrapper -->
+                <div class="border p-3" 
+                    style="border: 2px solid #ccc; border-radius: 15px; background-color: #fff; margin-top: 10px; width: 620px; height: 220px;">
+                    <h2 class="text-center mb-3" style="font-size: 18px;">Do you want to add tags to your post?</h2>
+                    <!-- Input Field for Tags -->
+                    <div class="d-flex align-items-center mb-3">
+                        <input 
+                            type="text" 
+                            id="additional-info" 
+                            name="additional_info" 
+                            class="form-control me-3" 
+                            placeholder="Enter additional details (if any)" 
+                            style="border: 2px solid #ccc; border-radius: 10px; padding: 10px; font-size: 12px; width: 481px;"
+                            oninput="fetchWikidataSuggestions(this.value)"
+                        >
+                        <!-- Add Tag Button -->
+                        <button 
+                            type="button" 
+                            class="btn btn-primary" 
+                            onclick="addTag()">
+                            Add Tag
+                        </button>
+                    </div>
 
-                <!-- Tags Container -->
-                <div id="tags-container" class="mt-3">
-                    <!-- Buttons for added tags will appear here -->
+                    <!-- Suggestions Container -->
+                    <ul id="suggestions-list" class="list-group mt-2" 
+                        style="position: absolute; z-index: 1000; width: 481px; max-height: calc(3 * 5em); overflow-y: auto;">  
+                    </ul>
+
+                    <!-- Tags Container -->
+                    <div id="tags-container" class="mt-3">
+                        <!-- Buttons for added tags will appear here -->
+                    </div>
+                    <!-- Hidden input to store tags -->
+                    <input type="hidden" name="tags" id="hidden-tags" value="">
                 </div>
-                <!-- Hidden input to store tags -->
-                <input type="hidden" name="tags" id="hidden-tags" value="">
-
-
-            </div>
-
-            <div class="border p-3 mb-4" 
-            style="border: 2px solid #ccc; border-radius: 15px; background-color: #fff; margin-top: 20px; margin-left: 20px; width: 615px;">
-            <h2 class="text-center mb-3" style="font-size: 18px;">Do you want to add tags to your post?</h2>
-            </div>
+            </div>    
         </div>
 
+        <div style="border: 2px solid #ccc; border-radius: 15px; background-color: #fff; margin-top: 10px; padding-top: 20px; width: 1250px;">
+            <h2 class="text-center mb-1" style="font-size: 18px;">Properties of the Mysterious Object!</h2>
+            <div class="d-flex justify-content-start">
+                
+                <div class="border p-3" 
+                    style="border: none !important; border-radius: 15px; background-color: #fff; margin-top: 0%; margin-left: 0px; width: 630px;">
+                    
+
+                    <div class="border p-3" 
+                        style="border: 2px solid #ccc; border-radius: 15px; background-color: #fff; margin-top: 10px; height: 250px;">
+                        <h3 class="text-center mb-3" style="font-size: 18px;">Colors of the Object</h3>
+                        
+                        <div class="d-flex align-items-center mb-3">
+                            <!-- Color Picker -->
+                            <div class="me-3" style="flex-grow: 1;">
+                                <label for="color-picker" class="form-label">Click on the bar to pick a color!</label>
+                                <input 
+                                    type="color" 
+                                    id="color-picker" 
+                                    name="color" 
+                                    value="#ffffff" 
+                                    placeholder="Select a color!"
+                                    class="form-control form-control-color"
+                                    style="border: 2px solid #ccc; border-radius: 10px; padding: 5px; width: 100%;">
+                            </div>
+                            <!-- Add Color Button -->
+                            <button 
+                                type="button" 
+                                class="btn btn-primary" 
+                                style="margin-top: 30px;"
+                                onclick="addColor()">
+                                Add Color                        
+                            </button>
+                        </div>
+                        <!-- Colors Container -->
+                        <div id="colors-container" class="mb-1">
+                        <!-- Added color buttons will appear here -->
+                        </div>
+                        <!-- Hidden input to store colors -->
+                        <input type="hidden" name="colors" id="hidden-colors" value="">
+                    </div>
+
+                    <div class="border p-3 mb-4" 
+                    style="border: 2px solid #ccc; border-radius: 15px; background-color: #fff; margin-top: 10px;">
+                    <h3 class="text-center mb-3" style="font-size: 18px;">Size of the Object</h3>
+                    <h3 class="text-center mb-3" style="font-size: 14px;">Type only numeric values in the textboxes. Use dot (.) for decimal numbers.</h3>
+                        
+                        <!-- Default Image with Buttons -->
+                        <div class="d-flex justify-content-between align-items-start">
+                            <!-- Default Image -->
+                            <div style="flex-grow: 1;">
+                                <img src="{% static 'images/default_dimensions.jpg' %}" 
+                                    alt="Default Size Dimensions" 
+                                    class="img-fluid" 
+                                    style="max-width: 100%; border: 1px solid #ccc; border-radius: 10px;">
+                            </div>
+                            
+                            <!-- Buttons and Textboxes Container -->
+                            <div class="ms-3">
+                                <!-- Buttons Container -->
+                                <div class="d-flex mb-3">
+                                    <!-- Assign Sizes Button -->
+                                    <button type="button" class="btn btn-primary me-2" onclick="assignSizes()">
+                                        Assign Sizes
+                                    </button>
+                                    <!-- Reset Sizes Button -->
+                                    <button type="button" class="btn btn-secondary" onclick="resetSizes()">
+                                        Reset Sizes
+                                    </button>
+                                </div>
+                        
+                                <!-- Textboxes Container -->
+                                <div>
+                                    <!-- Length Textbox with Label and Button -->
+                                    <div class="d-flex align-items-center mb-2">
+                                        <input 
+                                            type="text" 
+                                            id="length-input" 
+                                            name="length" 
+                                            class="form-control me-2" 
+                                            placeholder="Enter Length" 
+                                            style="border: 2px solid #ccc; border-radius: 10px; padding: 10px; font-size: 12px; width: 100px;">
+                                        <span style="white-space: nowrap; font-size: 14px; color: #333; width: 20px;"><strong>L:</strong></span>
+                                        <button type="button" class="btn btn-secondary btn-sm ms-2" id="length-button" style="width: 85px;"></button>
+                                    </div>
+                                
+                                    <!-- Width Textbox with Label and Button -->
+                                    <div class="d-flex align-items-center mb-2">
+                                        <input 
+                                            type="text" 
+                                            id="width-input" 
+                                            name="width" 
+                                            class="form-control me-2" 
+                                            placeholder="Enter Width" 
+                                            style="border: 2px solid #ccc; border-radius: 10px; padding: 10px; font-size: 12px; width: 100px;">
+                                        <span style="white-space: nowrap; font-size: 14px; color: #333; width: 20px;"><strong>W:</strong></span>
+                                        <button type="button" class="btn btn-secondary btn-sm ms-2" id="width-button" style="width: 85px;"></button>
+                                    </div>
+                                
+                                    <!-- Height Textbox with Label and Button -->
+                                    <div class="d-flex align-items-center">
+                                        <input 
+                                            type="text" 
+                                            id="height-input" 
+                                            name="height" 
+                                            class="form-control me-2" 
+                                            placeholder="Enter Height" 
+                                            style="border: 2px solid #ccc; border-radius: 10px; padding: 10px; font-size: 12px; width: 100px;">
+                                        <span style="white-space: nowrap; font-size: 14px; color: #333; width: 20px;"><strong>H:</strong></span>
+                                        <button type="button" class="btn btn-secondary btn-sm ms-2" id="height-button" style="width: 85px;"></button>
+                                    </div>
+                                </div>
+                                <!-- Hidden inputs to store the values -->
+                                <input type="hidden" id="hidden-length" name="hidden_length" value="">                           
+                                <input type="hidden" id="hidden-width" name="hidden_width" value="">
+                                <input type="hidden" id="hidden-height" name="hidden_height" value="">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        
+        </div>
         <!-- Post and Cancel Buttons -->
         <div class="text-end mt-4"style="width: 1250px;">
             <button type="submit" name="post" class="btn btn-success">Post</button>
-            <button type="submit" name="cancel" class="btn btn-danger">Cancel</button>
+            <a href="{% url 'post_list' %}" class="btn btn-danger">Cancel</a>
         </div>
     </form>
 </div>
@@ -179,33 +294,33 @@
     });
 
     function fetchWikidataSuggestions(query) {
-    const suggestionsList = document.getElementById('suggestions-list');
-    suggestionsList.innerHTML = ''; // Clear previous suggestions
+        const suggestionsList = document.getElementById('suggestions-list');
+        suggestionsList.innerHTML = ''; // Clear previous suggestions
 
-    if (!query.trim()) {
-        suggestionsList.style.display = 'none';
-        return;
-    }
+        if (!query.trim()) {
+            suggestionsList.style.display = 'none';
+            return;
+        }
 
-    const apiUrl = `https://www.wikidata.org/w/api.php?action=wbsearchentities&search=${encodeURIComponent(query)}&language=en&format=json&origin=*`;
+        const apiUrl = `https://www.wikidata.org/w/api.php?action=wbsearchentities&search=${encodeURIComponent(query)}&language=en&format=json&origin=*`;
 
-    fetch(apiUrl)
-        .then(response => response.json())
-        .then(data => {
-            if (data.search && data.search.length > 0) {
-                suggestionsList.style.display = 'block';
-                data.search.forEach(item => {
-                    const suggestionItem = document.createElement('li');
-                    suggestionItem.className = 'list-group-item list-group-item-action';
-                    suggestionItem.textContent = item.label + (item.description ? ` - ${item.description}` : '');
-                    suggestionItem.onclick = () => selectSuggestion(item.label);
-                    suggestionsList.appendChild(suggestionItem);
-                });
-            } else {
-                suggestionsList.style.display = 'none';
-            }
-        })
-        .catch(error => console.error('Error fetching suggestions:', error));
+        fetch(apiUrl)
+            .then(response => response.json())
+            .then(data => {
+                if (data.search && data.search.length > 0) {
+                    suggestionsList.style.display = 'block';
+                    data.search.forEach(item => {
+                        const suggestionItem = document.createElement('li');
+                        suggestionItem.className = 'list-group-item list-group-item-action';
+                        suggestionItem.textContent = item.label + (item.description ? ` - ${item.description}` : '');
+                        suggestionItem.onclick = () => selectSuggestion(item.label);
+                        suggestionsList.appendChild(suggestionItem);
+                    });
+                } else {
+                    suggestionsList.style.display = 'none';
+                }
+            })
+            .catch(error => console.error('Error fetching suggestions:', error));
     }
 
     function selectSuggestion(value) {
@@ -214,6 +329,7 @@
         inputField.value = value;
         suggestionsList.style.display = 'none';
     }
+
 
     function addTag() {
         const inputField = document.getElementById('additional-info');
@@ -286,6 +402,178 @@
 
         hiddenTags.value = tags.join(',');
     }
+
+
+    function addColor() {
+        const colorPicker = document.getElementById('color-picker');
+        const colorsContainer = document.getElementById('colors-container');
+        const hiddenColors = document.getElementById('hidden-colors');
+        const colorValue = colorPicker.value;
+
+        // Categorize the picked color
+        const colorCategory = categorizeColor(colorValue);
+
+        // Create a wrapper for the color and remove button
+        const colorWrapper = document.createElement('div');
+        colorWrapper.className = 'd-inline-block me-2 mb-2';
+
+        // Create the color button
+        const colorButton = document.createElement('button');
+        colorButton.className = 'btn btn-outline-primary';
+        colorButton.style.backgroundColor = colorValue;
+        colorButton.style.color = getTextColorForBackground(colorValue); // Ensure contrast
+        colorButton.textContent = colorCategory;
+
+        // Create the remove "X" button
+        const removeButton = document.createElement('button');
+        removeButton.className = 'btn btn-danger btn-sm ms-2';
+        removeButton.textContent = 'X';
+        removeButton.onclick = () => {
+            colorsContainer.removeChild(colorWrapper);
+            updateHiddenColors();
+        };
+
+        // Append the color button and remove button to the wrapper
+        colorWrapper.appendChild(colorButton);
+        colorWrapper.appendChild(removeButton);
+
+        // Append the wrapper to the colors container
+        colorsContainer.appendChild(colorWrapper);
+
+        // Update the hidden colors input field
+        updateHiddenColors();
+    }
+
+    // Categorize the picked color based on the RGB values
+    function categorizeColor(hexColor) {
+        // Convert hex to RGB
+        const rgb = parseInt(hexColor.substring(1), 16);
+        const r = (rgb >> 16) & 0xff;
+        const g = (rgb >> 8) & 0xff;
+        const b = rgb & 0xff;
+
+        // Apply the categorization rules
+        if (r > 1.2 * g && r > 1.2 * b) return "Red";
+        if (r > g && b > g && r >= 1.5 * b) return "Pink";
+        if (r > g && g > b) return "Orange";
+        if (r >= g && b < 0.5 * (r + g)) return "Yellow";
+        if (g > 1.2 * r && g > 1.2 * b) return "Green";
+        if (b > 1.2 * r && b > 1.2 * g) return "Blue";
+        if (r >= b && r > g && b > g) return "Purple";
+        if (r > g && g > b && r + g + b < 384) return "Brown";
+        if (Math.abs(r - g) < 20 && Math.abs(g - b) < 20 && r + g + b < 128) return "Black";
+        if (Math.abs(r - g) < 20 && Math.abs(g - b) < 20 && r + g + b > 700) return "White";
+        if (Math.abs(r - g) < 20 && Math.abs(g - b) < 20) return "Gray";
+        if (g === b && g > r) return "Cyan and Teal";
+        return "Neutral"; // Default category
+    }
+
+    // Helper function to determine text color for contrast
+    function getTextColorForBackground(color) {
+        // Convert hex color to RGB
+        const rgb = parseInt(color.substring(1), 16);
+        const r = (rgb >> 16) & 0xff;
+        const g = (rgb >> 8) & 0xff;
+        const b = rgb & 0xff;
+
+        // Calculate brightness
+        const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+
+        // Return black for bright colors, white for dark colors
+        return brightness > 125 ? '#000' : '#fff';
+    }
+
+    // Update the hidden colors input field
+    function updateHiddenColors() {
+        const colorsContainer = document.getElementById('colors-container');
+        const hiddenColors = document.getElementById('hidden-colors');
+        const colors = [];
+
+        colorsContainer.querySelectorAll('.btn-outline-primary').forEach(colorButton => {
+            colors.push(colorButton.textContent);
+        });
+
+        hiddenColors.value = colors.join(',');
+    }
+
+    // Function to validate and accept only positive numeric entries (integers or decimals)
+    function isNumeric(value) {
+        // Remove whitespace
+        value = value.trim();
+
+        // Allow a single leading dot and add 0 before it
+        if (value.startsWith(".")) {
+            value = "0" + value;
+        }
+
+        // Regular expression to match valid positive numbers (integers or decimals)
+        const numericRegex = /^\d+(\.\d+)?$/;
+
+        // Check if the value matches the regex
+        return numericRegex.test(value.trim()) ? value : null;
+    }
+
+    // Function to handle the Assign Sizes logic
+    function assignSizes() {
+        // Get input fields
+        const lengthInput = document.getElementById("length-input");
+        const widthInput = document.getElementById("width-input");
+        const heightInput = document.getElementById("height-input");
+
+        // Get the values entered in textboxes
+        let lengthValue = lengthInput.value.trim();
+        let widthValue = widthInput.value.trim();
+        let heightValue = heightInput.value.trim();
+
+        // Validate the inputs
+        const validLength = isNumeric(lengthValue);
+        const validWidth = isNumeric(widthValue);
+        const validHeight = isNumeric(heightValue);
+
+        // If any value is invalid, show an error message and exit
+        if (!validLength || !validWidth || !validHeight) {
+            alert("Do not enter invalid values as negative numbers, do not type any characters other than numbers and do not use any punctuations except dot!");
+            return; // Stop execution
+        }
+
+        // If all values are valid, update the buttons
+        updateSizeButton(validLength, "length-button");
+        updateSizeButton(validWidth, "width-button");
+        updateSizeButton(validHeight, "height-button");
+
+        console.log(`Length: ${validLength}, Width: ${validWidth}, Height: ${validHeight}`);
+    }
+
+    // Function to update buttons with the entered value
+    function updateSizeButton(value, buttonId) {
+        const button = document.getElementById(buttonId);
+        button.textContent = value; // Set the numeric value as button text
+        button.classList.remove("btn-secondary");
+        button.classList.add("btn-success");
+    }
+
+    // Function to reset sizes
+    function resetSizes() {
+        // Clear input fields
+        document.getElementById("length-input").value = "";
+        document.getElementById("width-input").value = "";
+        document.getElementById("height-input").value = "";
+
+        // Reset button text and class
+        resetSizeButton("length-button", "");
+        resetSizeButton("width-button", "");
+        resetSizeButton("height-button", "");
+    }
+
+    // Function to reset individual size buttons
+    function resetSizeButton(buttonId, defaultText) {
+        const button = document.getElementById(buttonId);
+        button.textContent = defaultText || ""; // Default text if not provided
+        button.classList.remove("btn-success");
+        button.classList.add("btn-secondary");
+    }
+
+
 
 
 
