@@ -73,10 +73,19 @@ class PostCreationForm(forms.ModelForm):
             'class': 'form-control',
         })
     )
+    price = forms.DecimalField(  # Add price field
+        required=False,
+        max_digits=10,
+        decimal_places=2,
+        widget=forms.TextInput(attrs={
+            'placeholder': 'Enter the price of the object',
+            'class': 'form-control',
+        })
+    )
 
     class Meta:
         model = Post
-        fields = ['title', 'content', 'image', 'tags', 'colors', 'length', 'width', 'height', 'weight']
+        fields = ['title', 'content', 'image', 'tags', 'colors', 'length', 'width', 'height', 'weight', 'price']
         widgets = {
             'title': forms.TextInput(attrs={
                 'class': 'form-control',

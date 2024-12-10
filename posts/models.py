@@ -10,15 +10,16 @@ class Tag(models.Model):
 
 class Post(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="posts")
-    title = models.CharField(max_length=255, default="Untitled")
-    content = models.TextField()
-    image = models.ImageField(upload_to='images/', null=True, blank=True)
-    tags = models.ManyToManyField('Tag', blank=True)
-    colors = models.TextField(blank=True, null=True)
-    length = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
-    width = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
-    height = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
-    weight = models.FloatField(null=True, blank=True)
+    title = models.CharField(max_length=255, null=False, blank=False)  # Required
+    image = models.ImageField(upload_to='uploads/', null=False, blank=False)  # Required
+    content = models.TextField(null=False, blank=False)  # Required
+    length = models.FloatField(null=True, blank=True)  # Optional
+    width = models.FloatField(null=True, blank=True)   # Optional
+    height = models.FloatField(null=True, blank=True)  # Optional
+    weight = models.FloatField(null=True, blank=True)  # Optional
+    price = models.FloatField(null=True, blank=True)   # Optional
+    colors = models.TextField(null=True, blank=True)   # Optional
+    tags = models.ManyToManyField(Tag, blank=True)     # Optional
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

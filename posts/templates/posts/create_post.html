@@ -276,6 +276,42 @@
                             <div id="weight-container" style="margin-left: 10px;"></div>
                         </div>                   
                     </div>
+
+                    <div class="border p-3 mb-4" 
+                        style="border: 2px solid #ccc; border-radius: 15px; background-color: #fff; margin-top: 10px;">
+                        <h3 class="text-center mb-3" style="font-size: 18px;">Price of the Object!</h3>
+                        <p class="text-muted">Please consider [$] as currency! Use dot (.) for decimal numbers!</p>
+                        <!-- Hidden input to store price-->
+                        <input type="hidden" name="hidden_price" id="hidden-price" value="">
+                        <div class="d-flex align-items-center">
+                            <!-- Example Content -->
+                            <div style="padding: 10px;">
+                                <input 
+                                    type="text" 
+                                    id="price" 
+                                    name="price" 
+                                    class="form-control"
+                                    step="0.01" 
+                                    placeholder="Enter some value" 
+                                    style="border: 2px solid #ccc; border-radius: 10px; padding: 10px; font-size: 14px; width: 160px;"
+                                    maxlength="11"/>
+                            </div>
+                            <div class="d-flex align-items-center">
+                                <!-- Assign Price Button -->
+                                <button 
+                                    type="button" 
+                                    class="btn btn-primary" 
+                                    style="height: 45px;" 
+                                    onclick="assignPrice()">
+                                    Assign Price
+                                </button>
+                            </div>
+                            <strong class="text-muted" style="margin-left: 10px;">Price [$]:</strong>
+                            <!-- Container to hold the weight button -->
+                            <div id="price-container" style="margin-left: 10px;"></div>
+                        </div>                   
+                    </div>
+
                 </div>
             </div>
         
@@ -667,6 +703,60 @@
     }
 
 
+    function assignPrice() {
+        const inputField = document.getElementById("price");
+        const priceContainer = document.getElementById("price-container");
+        let inputValue = inputField.value.trim();
+
+        // If the value starts with a dot (.), prepend a zero (e.g., ".5" becomes "0.5")
+        if (inputValue.startsWith(".")) {
+            inputValue = "0" + inputValue;
+        }
+
+        // Validate input: allow only numeric values and decimal numbers, no punctuation except dot (.)
+        const isValid = /^\d+(\.\d+)?$/.test(inputValue);
+
+        if (!isValid) {
+            alert("Please enter a valid positive number for Price. Only numeric values and a single dot (.) are allowed.");
+            return;
+        }
+
+        // Check if a button already exists to prevent multiple creations
+        if (priceContainer.children.length > 0) {
+            alert("A price is already assigned. Remove the existing price first.");
+            return;
+        }
+
+        // Create a wrapper for the button and remove "X" button
+        const buttonWrapper = document.createElement("div");
+        buttonWrapper.className = "d-inline-block";
+
+        // Create the price button
+        const priceButton = document.createElement("button");
+        priceButton.className = "btn btn-outline-primary";
+        priceButton.textContent = `${inputValue}`;
+
+        // Create the "X" button to remove the price
+        const removeButton = document.createElement("button");
+        removeButton.className = "btn btn-danger btn-sm ms-2";
+        removeButton.textContent = "X";
+        removeButton.onclick = () => {
+            priceContainer.removeChild(buttonWrapper);
+        };
+
+        // Append the price button and "X" button to the wrapper
+        buttonWrapper.appendChild(priceButton);
+        buttonWrapper.appendChild(removeButton);
+
+        // Append the wrapper to the container
+        priceContainer.appendChild(buttonWrapper);
+
+        // Update the hidden input field with the assigned price
+        document.getElementById("hidden-price").value = inputValue;
+
+        // Clear the input field
+        inputField.value = "";
+    }
 
 
 

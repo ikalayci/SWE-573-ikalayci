@@ -29,7 +29,8 @@ def create_post(request):
                 post.width = float(width) if width and width.replace('.', '', 1).isdigit() else None
                 post.height = float(height) if height and height.replace('.', '', 1).isdigit() else None
                 post.weight = float(weight) if weight and weight.replace('.', '', 1).isdigit() else None
-
+                post.price = float(request.POST.get('hidden_price')) if request.POST.get('hidden_price') else None
+                post.colors = request.POST.get('colors', '')
                 # Validate weight
                 if post.weight is not None and post.weight <= 0:
                     raise ValueError("Weight must be a positive number.")
@@ -47,9 +48,7 @@ def create_post(request):
                 for tag_name in tag_names:
                     tag, _ = Tag.objects.get_or_create(name=tag_name)
                     post.tags.add(tag)
-
-            # Handle colors
-            post.colors = form.cleaned_data.get('colors', '')
+          
             post.save()
 
             messages.success(request, "Post created successfully!")
