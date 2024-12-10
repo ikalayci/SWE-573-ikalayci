@@ -164,7 +164,7 @@
                         <input type="hidden" name="colors" id="hidden-colors" value="">
                     </div>
 
-                    <div class="border p-3 mb-4" 
+                    <div class="border p-3" 
                     style="border: 2px solid #ccc; border-radius: 15px; background-color: #fff; margin-top: 10px;">
                     <h3 class="text-center mb-3" style="font-size: 18px;">Size of the Object</h3>
                     <h3 class="text-center mb-3" style="font-size: 14px;">Type only numeric values in the textboxes. Use dot (.) for decimal numbers.</h3>
@@ -240,6 +240,41 @@
                                 <input type="hidden" id="hidden-height" name="hidden_height" value="">
                             </div>
                         </div>
+                    </div>
+
+                    <div class="border p-3 mb-4" 
+                        style="border: 2px solid #ccc; border-radius: 15px; background-color: #fff; margin-top: 10px;">
+                        <h3 class="text-center mb-3" style="font-size: 18px;">Weight of the Object!</h3>
+                        <p class="text-muted">Please consider [g] as unit of measure! Use dot (.) for decimal numbers!</p>
+                        <!-- Hidden input to store weight -->
+                        <input type="hidden" name="hidden_weight" id="hidden-weight" value="">
+                        <div class="d-flex align-items-center">
+                            <!-- Example Content -->
+                            <div style="padding: 10px;">
+                                <input 
+                                    type="text" 
+                                    id="weight" 
+                                    name="weight" 
+                                    class="form-control"
+                                    step="0.01" 
+                                    placeholder="Enter some value" 
+                                    style="border: 2px solid #ccc; border-radius: 10px; padding: 10px; font-size: 14px; width: 160px;"
+                                    maxlength="11"/>
+                            </div>
+                            <div class="d-flex align-items-center">
+                                <!-- Assign Weight Button -->
+                                <button 
+                                    type="button" 
+                                    class="btn btn-primary" 
+                                    style="height: 45px;" 
+                                    onclick="assignWeight()">
+                                    Assign Weight
+                                </button>
+                            </div>
+                            <strong class="text-muted" style="margin-left: 10px;">Weight [g]:</strong>
+                            <!-- Container to hold the weight button -->
+                            <div id="weight-container" style="margin-left: 10px;"></div>
+                        </div>                   
                     </div>
                 </div>
             </div>
@@ -520,21 +555,21 @@
         const widthInput = document.getElementById("width-input");
         const heightInput = document.getElementById("height-input");
 
-        // Get the values entered in textboxes
-        let lengthValue = lengthInput.value.trim();
-        let widthValue = widthInput.value.trim();
-        let heightValue = heightInput.value.trim();
-
-        // Validate the inputs
-        const validLength = isNumeric(lengthValue);
-        const validWidth = isNumeric(widthValue);
-        const validHeight = isNumeric(heightValue);
+        // Get the values entered in textboxes and validate the inputs
+        const validLength = isNumeric(lengthInput.value.trim());
+        const validWidth = isNumeric(widthInput.value.trim());
+        const validHeight = isNumeric(heightInput.value.trim());
 
         // If any value is invalid, show an error message and exit
         if (!validLength || !validWidth || !validHeight) {
             alert("Do not enter invalid values as negative numbers, do not type any characters other than numbers and do not use any punctuations except dot!");
             return; // Stop execution
         }
+
+        // Update the hidden fields with valid values
+        document.getElementById("hidden-length").value = validLength;
+        document.getElementById("hidden-width").value = validWidth;
+        document.getElementById("hidden-height").value = validHeight;
 
         // If all values are valid, update the buttons
         updateSizeButton(validLength, "length-button");
@@ -571,6 +606,64 @@
         button.textContent = defaultText || ""; // Default text if not provided
         button.classList.remove("btn-success");
         button.classList.add("btn-secondary");
+    }
+
+    function assignWeight() {
+        const inputField = document.getElementById("weight");
+        const weightContainer = document.getElementById("weight-container");
+        const hiddenWeight = document.getElementById("hidden-weight"); // Hidden input
+
+        let inputValue = inputField.value.trim();
+
+        // If the value starts with a dot (.), prepend a zero (e.g., ".5" becomes "0.5")
+        if (inputValue.startsWith(".")) {
+            inputValue = "0" + inputValue;
+        }
+
+        // Validate input: allow only numeric values and decimal numbers, no punctuation except dot (.)
+        const isValid = /^\d+(\.\d+)?$/.test(inputValue);
+
+        if (!isValid) {
+            alert("Please enter a valid positive number. Only numeric values and a single dot (.) are allowed.");
+            return;
+        }
+
+        // Check if a button already exists to prevent multiple creations
+        if (weightContainer.children.length > 0) {
+            alert("A weight is already assigned. Remove the existing weight first.");
+            return;
+        }
+
+        // Create a wrapper for the button and remove "X" button
+        const buttonWrapper = document.createElement("div");
+        buttonWrapper.className = "d-inline-block";
+
+        // Create the weight button
+        const weightButton = document.createElement("button");
+        weightButton.className = "btn btn-outline-primary";
+        weightButton.textContent = `${inputValue}`;
+
+        // Create the "X" button to remove the weight
+        const removeButton = document.createElement("button");
+        removeButton.className = "btn btn-danger btn-sm ms-2";
+        removeButton.textContent = "X";
+        removeButton.onclick = () => {
+            weightContainer.removeChild(buttonWrapper);
+            hiddenWeight.value = ""; // Clear the hidden weight field
+        };
+
+        // Append the weight button and "X" button to the wrapper
+        buttonWrapper.appendChild(weightButton);
+        buttonWrapper.appendChild(removeButton);
+
+        // Append the wrapper to the container
+        weightContainer.appendChild(buttonWrapper);
+
+        // Update the hidden input field with the weight value
+        hiddenWeight.value = inputValue;
+
+        // Clear the input field
+        inputField.value = "";
     }
 
 
