@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -89,37 +90,213 @@
             padding-top: 0.1rem !important;
             padding-bottom: 0.1rem !important;
         }
+        /* Search suggestions styling */
+        #searchSuggestions {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            z-index: 1100;
+            background-color: #5d7082;  /* Match search input background */
+            border: 1px solid #34414b;  /* Match search input border */
+            border-radius: 4px;
+            box-shadow: 0 6px 12px rgba(0,0,0,.3);
+            padding: 8px 0;
+            margin-top: 4px;
+            max-height: 300px;
+            overflow-y: auto;
+            display: none;
+            width: 100%;
+        }
+        
+        .suggestion-item {
+            padding: 8px 16px;
+            cursor: pointer;
+            color: white;  /* Match search input text color */
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-height: 40px;
+            background-color: #5d7082;  /* Match search input background */
+            border-left: none;
+            border-right: none;
+        }
+        
+        .suggestion-item:hover {
+            background-color: #6d8092;  /* Match search input focus color */
+        }
+        
+        .suggestion-text {
+            flex-grow: 1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            color: white;  /* Ensure text is white */
+        }
+        
+        .suggestion-category {
+            font-size: 0.8em;
+            color: #d0d6dc;  /* Light gray color for better contrast */
+            padding: 2px 6px;
+            background-color: rgba(255, 255, 255, 0.1);  /* Semi-transparent white */
+            border-radius: 4px;
+            white-space: nowrap;
+        }
+
+        /* Style the scrollbar for the suggestions dropdown */
+        #searchSuggestions::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        #searchSuggestions::-webkit-scrollbar-track {
+            background: #4a5b69;
+            border-radius: 4px;
+        }
+
+        #searchSuggestions::-webkit-scrollbar-thumb {
+            background: #34414b;
+            border-radius: 4px;
+        }
+
+        #searchSuggestions::-webkit-scrollbar-thumb:hover {
+            background: #2a3640;
+        }
+
+        /* Add this style for the search input */
+        #searchInput {
+            background-color: #5d7082;  /* Lighter version than before */
+            border-color: #34414b;
+            color: white;
+        }
+        
+        #searchInput::placeholder {
+            color: #d0d6dc;  /* Slightly lighter placeholder text */
+        }
+        
+        #searchInput:focus {
+            background-color: #6d8092;  /* Even lighter when focused */
+            color: white;
+            box-shadow: 0 0 0 0.25rem rgba(52, 65, 75, 0.25);
+            border-color: #34414b;
+        }
+        /* Update search container positioning */
+        .search-container {
+            position: relative;
+            width: 500px; /* Fixed width */
+            margin: 0 auto;
+            z-index: 1100;
+        }
+
+        /* Center search form container */
+        .search-form-container {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 500px; /* Match search-container width */
+        }
+
+        /* Add these navbar button styles to the top of your existing styles */
+        .navbar .btn {
+            border-width: 1px !important;
+            padding: 6px 10px !important;
+            font-size: 14px !important;
+            line-height: 1.5 !important;
+            height: auto !important;
+        }
+
+        .navbar .btn-outline-light {
+            background-color: transparent !important;
+            border-color: #fff !important;
+            color: #fff !important;
+        }
+
+        .navbar .btn-outline-light:hover {
+            background-color: rgba(255, 255, 255, 0.1) !important;
+        }
+
+        .navbar .btn-outline-danger {
+            background-color: transparent !important;
+            border-color: #dc3545 !important;
+            color: #dc3545 !important;
+        }
+
+        .navbar .btn-outline-danger:hover {
+            background-color: rgba(220, 53, 69, 0.1) !important;
+        }
+
+        /* Ensure consistent spacing */
+        .navbar .button-spacing {
+            margin-right: 0.5rem !important;
+        }
+
+        .navbar .ms-2 {
+            margin-left: 0.5rem !important;
+        }
+
+        .navbar .me-1 {
+            margin-right: 0.25rem !important;
+        }
     </style>
 </head>
 <body>
     <!-- Fixed Navigation Bar -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container-fluid">
-            <!-- Website Name -->
+            <!-- Left side: Home, Website Name, and Add Post -->
             <div class="d-flex align-items-center">
-                <a href="{% url 'post_list' %}" class="btn btn-secondary me-2">Home</a>
+                <a href="{% url 'posts:post_list' %}" class="btn btn-outline-light me-2">Home</a>
                 <span class="navbar-brand mb-0 h1 home-text-gap">SnapTrace.com</span>
+                {% if user.is_authenticated %}
+                    <a href="{% url 'posts:create_post' %}" class="btn btn-outline-light ms-3">Add Post</a>
+                {% endif %}
             </div>
-            
 
-
-            <!-- Right-aligned Buttons (conditionally hidden for login/register pages) -->
-            {% if request.path != '/accounts/login/' and request.path != '/accounts/register/' %}
-                <div class="d-flex ms-auto align-items-center">
-                    {% if user.is_authenticated %}
-                        <!-- Welcome Message -->
-                        <span class="navbar-text text-white me-3">Welcome, {{ user.username }}!</span>
-                        <!-- Profile Button -->
-                        <a href="{% url 'profile' %}" class="btn btn-secondary button-spacing">Profile</a>
-                        <!-- Logout Button -->
-                        <a href="{% url 'logout' %}" class="btn btn-danger">Logout</a>
-                    {% else %}
-                        <!-- Login and Register Buttons -->
-                        <a href="{% url 'login' %}" class="btn btn-secondary button-spacing">Login</a>
-                        <a href="{% url 'register' %}" class="btn btn-secondary">Register</a>
-                    {% endif %}
+            <!-- Center: Search Form -->
+            <div class="search-form-container">
+                <div class="search-container">
+                    <form class="d-flex w-100" method="GET" action="{% url 'posts:post_list' %}">
+                        <input 
+                            class="form-control me-2" 
+                            type="search" 
+                            placeholder="Search posts..." 
+                            aria-label="Search"
+                            name="q"
+                            id="searchInput"
+                            autocomplete="off">
+                        <button class="btn btn-outline-light" type="submit">Search</button>
+                    </form>
+                    <div id="searchSuggestions"></div>
                 </div>
-            {% endif %}
+            </div>
+
+            <!-- Right side: User Actions -->
+            <div class="d-flex ms-auto align-items-center">
+                {% if user.is_authenticated %}
+                    <!-- Profile Picture and Welcome Message -->
+                    <div class="d-flex align-items-center me-3">
+                        {% if user.profile.profile_picture %}
+                            <img src="{{ user.profile.profile_picture.url }}" 
+                                 alt="Profile picture" 
+                                 class="rounded-circle me-2"
+                                 style="width: 38px; height: 38px; object-fit: cover;">
+                        {% else %}
+                            <img src="{% static 'images/default-profile-picture.png' %}" 
+                                 alt="Default profile picture" 
+                                 class="rounded-circle me-2"
+                                 style="width: 38px; height: 38px; object-fit: cover;">
+                        {% endif %}
+                        <span class="navbar-text text-white">Welcome, {{ user.username }}!</span>
+                    </div>
+                    <!-- Profile Button -->
+                    <a href="{% url 'profile' %}" class="btn btn-outline-light me-1">Profile</a>
+                    <!-- Logout Button -->
+                    <a href="{% url 'logout' %}" class="btn btn-outline-danger">Logout</a>
+                {% else %}
+                    <!-- Login and Register Buttons -->
+                    <a href="{% url 'login' %}" class="btn btn-outline-light button-spacing">Login</a>
+                    <a href="{% url 'register' %}" class="btn btn-outline-light ms-2">Register</a>
+                {% endif %}
+            </div>
         </div>
     </nav>
 
@@ -149,6 +326,82 @@
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.getElementById('searchInput');
+        const suggestionsDiv = document.getElementById('searchSuggestions');
+        let timeoutId;
+        let selectedIndex = -1;
+
+        searchInput.addEventListener('input', function() {
+            clearTimeout(timeoutId);
+            const query = this.value;
+            selectedIndex = -1;
+            
+            console.log('Input value:', query); // Debug log
+            
+            if (query.length < 2) {
+                suggestionsDiv.style.display = 'none';
+                return;
+            }
+
+            timeoutId = setTimeout(() => {
+                const url = `{% url 'posts:search_suggestions' %}?q=${encodeURIComponent(query)}`;
+                console.log('Fetching from:', url);
+                
+                fetch(url)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log('Received data:', data);
+                        suggestionsDiv.innerHTML = '';
+                        if (data.length > 0) {
+                            data.forEach(item => {
+                                const div = document.createElement('div');
+                                div.className = 'suggestion-item';
+                                div.innerHTML = `
+                                    <span class="suggestion-icon">${item.icon}</span>
+                                    <span class="suggestion-text">${item.text}</span>
+                                    <span class="suggestion-category">${item.category}</span>
+                                `;
+                                div.addEventListener('click', () => {
+                                    searchInput.value = item.text;
+                                    suggestionsDiv.style.display = 'none';
+                                    searchInput.form.submit();
+                                });
+                                suggestionsDiv.appendChild(div);
+                            });
+                            suggestionsDiv.style.display = 'block';
+                        } else {
+                            suggestionsDiv.style.display = 'none';
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error fetching suggestions:', error);
+                        suggestionsDiv.style.display = 'none';
+                    });
+            }, 300);
+        });
+
+        // Close suggestions when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!searchInput.contains(e.target) && !suggestionsDiv.contains(e.target)) {
+                suggestionsDiv.style.display = 'none';
+            }
+        });
+
+        // Prevent form submission when selecting suggestions with enter key
+        searchInput.form.addEventListener('submit', function(e) {
+            if (selectedIndex >= 0) {
+                e.preventDefault();
+            }
+        });
+    });
+    </script>
 </body>
 </html>
 

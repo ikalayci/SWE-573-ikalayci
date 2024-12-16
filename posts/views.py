@@ -4,6 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .models import Post, Comment, Tag
 from .forms import PostCreationForm
+from django.db.models import Q
 
 
 
@@ -83,7 +84,18 @@ def create_post(request):
 
 
 def post_list(request):
+    query = request.GET.get('q')
     posts = Post.objects.all().order_by('-created_at')
+    
+    if query:
+        posts = posts.filter(
+            Q(title__icontains=query) |
+            Q(content__icontains=query) |
+            Q(materials__icontains=query) |
+            Q(time_period__icontains=query) |
+            Q(tags__name__icontains=query)
+        ).distinct()
+    
     for post in posts:
         # Process colors
         post.split_colors = post.colors.split(',') if post.colors else []

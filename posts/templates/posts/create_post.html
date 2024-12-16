@@ -2,9 +2,9 @@
 {% load static %}
 {% block content %}
 <div class="container mt-4">
-    <h2 class="text-center mb-4">Create a Post!</h2>
+    <h2 class="text-center mb-4 fw-bold" style="color: #34414b;">Create a Post!</h2>
 
-    <form method="POST" enctype="multipart/form-data" action="{% url 'create_post' %}">
+    <form method="post" action="{% url 'posts:create_post' %}" enctype="multipart/form-data">
         {% csrf_token %}
 
         <!-- Title -->
@@ -739,7 +739,7 @@
         <!-- Post and Cancel Buttons -->
         <div class="text-center" style="margin-bottom: 50px;">
             <button type="submit" name="post" style="font-size: 26px;" class="btn btn-success">Post</button>
-            <a href="{% url 'post_list' %}" class="btn btn-danger" style="font-size: 26px;">Cancel</a>
+            <a href="{% url 'posts:post_list' %}" class="btn btn-danger" style="font-size: 26px;">Cancel</a>
         </div>
     </form>
 </div>

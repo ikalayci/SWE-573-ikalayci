@@ -2,7 +2,7 @@
 {% load static %}
 
 {% block content %}
-<h2 class="text-center mb-4">User Profile</h2>
+<h2 class="text-center mb-4 fw-bold" style="color: #34414b;">User Profile</h2>
 
 <!-- Include Cropper.js -->
 <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" rel="stylesheet">
@@ -25,7 +25,7 @@
                     </div>
                     {% if is_own_profile %}
                     <div class="update-button-wrapper">
-                        <button id="update-button" class="btn btn-secondary btn-sm picture-update-button" onclick="enableProfilePictureEdit()">Update</button>
+                        <button id="update-button" class="btn btn-primary btn-sm" onclick="enableProfilePictureEdit()">Update</button>
                     </div>
                     
                     <div id="profile-picture-edit" class="d-none mt-2 text-center">
@@ -36,7 +36,7 @@
                         </div>
                         <div class="d-flex justify-content-center align-items-center gap-3 mt-3">
                             <input type="file" id="file-input" accept="image/*" style="display: none;" onchange="loadAndDisplayImage(event)">
-                            <button id="upload-picture-button" class="btn btn-secondary btn-sm" onclick="document.getElementById('file-input').click();">Upload Picture</button>
+                            <button id="upload-picture-button" class="btn btn-primary btn-sm" onclick="document.getElementById('file-input').click();">Upload Picture</button>
                             <div id="additional-container" class="border p-2 d-flex align-items-center" style="min-width: 300px;">
                                 <p id="file-path" class="text-muted mb-0 mx-auto">No Selection</p>
                             </div>
@@ -57,7 +57,7 @@
                         <div id="username-buttons" class="text-end mt-2">
                             <button class="btn btn-success btn-sm d-none" onclick="saveEdit('username')">Save</button>
                             <button class="btn btn-danger btn-sm ms-2 d-none" onclick="cancelEdit('username', '{{ profile_user.username }}')">Cancel</button>
-                            <button class="btn btn-secondary btn-sm" onclick="enableEdit('username')">Update</button>
+                            <button class="btn btn-primary btn-sm" onclick="enableEdit('username')">Update</button>
                         </div>
                         {% endif %}
                     </div>
@@ -73,7 +73,7 @@
                         <div id="email-buttons" class="text-end mt-2">
                             <button class="btn btn-success btn-sm d-none" onclick="saveEdit('email')">Save</button>
                             <button class="btn btn-danger btn-sm ms-2 d-none" onclick="cancelEdit('email', '{{ profile_user.email }}')">Cancel</button>
-                            <button class="btn btn-secondary btn-sm" onclick="enableEdit('email')">Update</button>
+                            <button class="btn btn-primary btn-sm" onclick="enableEdit('email')">Update</button>
                         </div>
                         {% endif %}
                     </div>
@@ -94,7 +94,7 @@
                     <div id="password-buttons" class="text-end mt-2">
                         <button class="btn btn-success btn-sm d-none" onclick="savePassword()">Save</button>
                         <button class="btn btn-danger btn-sm ms-2 d-none" onclick="cancelPasswordEdit()">Cancel</button>
-                        <button class="btn btn-secondary btn-sm" onclick="enablePasswordEdit()">Update</button>
+                        <button class="btn btn-primary btn-sm" onclick="enablePasswordEdit()">Update</button>
                     </div>
                 </li>
                 {% endif %}
@@ -109,7 +109,7 @@
                         <div id="profession-buttons" class="text-end mt-2">
                             <button class="btn btn-success btn-sm d-none" onclick="saveEdit('profession')">Save</button>
                             <button class="btn btn-danger btn-sm ms-2 d-none" onclick="cancelEdit('profession', `{{ profile.profession|escapejs }}`)">Cancel</button>
-                            <button class="btn btn-secondary btn-sm" onclick="enableEdit('profession')">Update</button>
+                            <button class="btn btn-primary btn-sm" onclick="enableEdit('profession')">Update</button>
                         </div>
                         {% endif %}
                     </div>
@@ -125,7 +125,7 @@
                         <div id="bio-buttons" class="text-end mt-2">
                             <button class="btn btn-success btn-sm d-none" onclick="saveEdit('bio')">Save</button>
                             <button class="btn btn-danger btn-sm ms-2 d-none" onclick="cancelEdit('bio', `{{ profile.bio|escapejs }}`)">Cancel</button>
-                            <button class="btn btn-secondary btn-sm" onclick="enableEdit('bio')">Update</button>
+                            <button class="btn btn-primary btn-sm" onclick="enableEdit('bio')">Update</button>
                         </div>
                         {% endif %}
                     </div>
@@ -134,7 +134,7 @@
 
             <!-- Navigation Buttons - Moved here -->
             <div class="text-center mt-4">
-                <a href="{% url 'post_list' %}" class="btn btn-secondary">Back to Posts</a>
+                <a href="{% url 'posts:post_list' %}" class="btn btn-primary">Back to Posts</a>
                 {% if is_own_profile %}
                 <a href="{% url 'logout' %}" class="btn btn-danger">Logout</a>
                 {% endif %}
@@ -251,13 +251,6 @@
         font-size: 14px;
     }
 
-    .navbar .btn {
-        border-width: 1px;
-        padding: 6px 10px;
-        font-size: 14px;
-        line-height: 1.5;
-    }
-
     /* Additional styling for text elements */
     .text-wrap {
         word-break: break-word;
@@ -315,6 +308,74 @@
     .card-body .text-center.mt-4 {
         margin-top: 2rem !important;
         padding-top: 1rem;
+    }
+
+    /* Button Styling */
+    .btn {
+        border-width: 2px;
+        padding: 6px 12px;
+        font-weight: 500;
+        border-radius: 4px;
+        transition: all 0.3s ease;
+    }
+
+    .btn-sm {
+        padding: 4px 8px;
+        font-size: 14px;
+    }
+
+    .btn-primary {
+        background-color: #34414b;
+        border-color: #34414b;
+        color: white;
+    }
+
+    .btn-primary:hover {
+        background-color: #2c3840;
+        border-color: #2c3840;
+        transform: translateY(-1px);
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .btn-success {
+        background-color: #198754;
+        border-color: #198754;
+        color: white;
+    }
+
+    .btn-success:hover {
+        background-color: #157347;
+        border-color: #146c43;
+        transform: translateY(-1px);
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .btn-danger {
+        background-color: #dc3545;
+        border-color: #dc3545;
+    }
+
+    .btn-danger:hover {
+        background-color: #c82333;
+        border-color: #bd2130;
+        transform: translateY(-1px);
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    /* Button spacing */
+    .btn + .btn {
+        margin-left: 8px;
+    }
+
+    /* Button container spacing */
+    .text-end.mt-2 {
+        margin-top: 1rem !important;
+    }
+
+    /* Navigation buttons specific styling */
+    .text-center.mt-4 .btn {
+        min-width: 100px;
+        margin: 0 5px;
     }
 </style>
 

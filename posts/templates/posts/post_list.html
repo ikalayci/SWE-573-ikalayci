@@ -2,16 +2,7 @@
 {% load static %}
 
 {% block content %}
-<h2 class="text-center mb-1">Mysterious Objects</h2>
-
-<!-- Display Add Post button -->
-<div class="d-flex justify-content-between mb-1">
-    <div>
-        {% if user.is_authenticated %}
-            <a href="{% url 'create_post' %}" class="btn btn-secondary">Add Post</a>
-        {% endif %}
-    </div>
-</div>
+<h2 class="text-center mb-5 fw-bold" style="color: #34414b;">Mysterious Objects</h2>
 
 <!-- Posts Grid -->
 <div class="row row-cols-1 row-cols-md-3">
@@ -20,7 +11,7 @@
             <div class="card">
                 <!-- Status button -->
                 <div class="status-button">
-                    <button class="btn btn-danger btn-sm">Unsolved</button>
+                    <button class="btn btn-outline-danger btn-sm">Unsolved</button>
                 </div>
                 
                 <!-- Card Header Section -->
@@ -94,14 +85,14 @@
                 <div class="card-footer-section">
                     <!-- View Details Button -->
                     <div class="button-container">
-                        <a href="{% url 'post_detail' post.id %}" class="btn btn-secondary btn-sm">View Details</a>
+                        <a href="{% url 'posts:post_detail' post.id %}" class="btn btn-outline-light btn-sm">View Details</a>
                     </div>
                 </div>
             </div>
         </div>
     {% empty %}
         <div class="col-12">
-            <p>No posts yet. Be the first to <a href="{% url 'create_post' %}" class="btn btn-secondary">create one</a>!</p>
+            <p>No posts yet. {% if user.is_authenticated %}Click the "Add Post" button in the navigation bar to create one!{% endif %}</p>
         </div>
     {% endfor %}
 </div>
@@ -266,6 +257,57 @@
     .col {
         padding: 0 15px;
         margin-bottom: 40px;
+    }
+
+    /* Status button styling */
+    .status-button .btn-outline-danger {
+        color: #dc3545;
+        border-color: #dc3545;
+        background-color: transparent;
+    }
+
+    .status-button .btn-outline-danger:hover {
+        background-color: rgba(220, 53, 69, 0.1);
+        color: #dc3545;
+    }
+
+    /* View Details button styling */
+    .card-footer-section .btn-outline-light {
+        color: white;
+        border-color: white;
+        background-color: transparent;
+    }
+
+    .card-footer-section .btn-outline-light:hover {
+        background-color: rgba(255, 255, 255, 0.1);
+        color: white;
+    }
+
+    /* Consistent button sizing */
+    .status-button .btn,
+    .button-container .btn {
+        padding: 4px 8px;
+        font-size: 12px;
+        line-height: 1.5;
+        border-width: 1px;
+    }
+
+    /* Update card footer section background */
+    .card-footer-section {
+        background-color: #34414b;
+        border-bottom-left-radius: 5px;
+        border-bottom-right-radius: 5px;
+        padding: 10px 15px;
+        border: 2px solid #34414b;
+        border-top: none;
+    }
+
+    /* Update status button positioning */
+    .status-button {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        z-index: 1;
     }
 </style>
 {% endblock %}

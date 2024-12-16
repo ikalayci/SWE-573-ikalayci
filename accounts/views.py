@@ -16,7 +16,7 @@ from django.conf import settings
 # Login Code
 def login_view(request):
     if request.user.is_authenticated:
-        return redirect('post_list')  # Redirect if already logged in
+        return redirect('posts:post_list')  # Changed from 'home' to 'posts:post_list'
 
     if request.method == 'POST':
         username = request.POST.get('username')
@@ -24,7 +24,7 @@ def login_view(request):
         user = authenticate(request, username=username, password=password)
         if user is not None:
             login(request, user)
-            return redirect('post_list')  # Redirect to post list after login
+            return redirect('posts:post_list')  # Changed from 'home' to 'posts:post_list'
         else:
             messages.error(request, 'Invalid username or password')
     return render(request, 'accounts/login.html')
@@ -37,28 +37,24 @@ def logout_view(request):
 # Register Code
 def register_view(request):
     if request.user.is_authenticated:
-        return redirect('post_list')  # Redirect if already logged in
+        return redirect('home')  # Changed from 'post_list' to 'home'
 
     if request.method == 'POST':
         username = request.POST.get('username')
-        email = request.POST.get('email')  # Capture the email field
+        email = request.POST.get('email')
         password = request.POST.get('password')
         password_confirm = request.POST.get('password_confirm')
 
-        # Ensure passwords match
         if password == password_confirm:
-            # Check if username or email already exists
             if User.objects.filter(username=username).exists():
                 messages.error(request, 'Username already exists')
             elif User.objects.filter(email=email).exists():
                 messages.error(request, 'Email already registered')
             else:
-                # Create the user and log them in
                 user = User.objects.create_user(username=username, email=email, password=password)
-                # Create default profile for the user
                 Profile.objects.get_or_create(user=user, defaults={"profession": "Unknown", "bio": "Unknown"})
                 login(request, user)
-                return redirect('post_list')  # Redirect to post list after successful registration
+                return redirect('home')  # Changed from 'post_list' to 'home'
         else:
             messages.error(request, 'Passwords do not match')
     
@@ -77,7 +73,7 @@ def update_profile_picture(request):
 # Home Page
 def home(request):
     if request.user.is_authenticated:
-        return redirect('post_list')  # Redirect logged-in users to post list
+        return render(request, 'accounts/home.html')  # Changed from redirect('post_list')
     return render(request, 'accounts/home.html')
 
 # Profile Page with Update Capability
