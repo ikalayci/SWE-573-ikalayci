@@ -8,4 +8,5 @@ urlpatterns = [
     path('register/', views.register_view, name='register'),
     path('profile/', views.profile_view, name='profile'),  # Profile URL
     path('update-profile-picture/', views.update_profile_picture, name='update_profile_picture'),  # Update Profile Picture URL
+    path('profile/<str:username>/', views.user_profile, name='user_profile'),
 ]

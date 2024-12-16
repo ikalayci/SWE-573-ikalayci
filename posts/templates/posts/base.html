@@ -11,6 +11,9 @@
             top: 0;
             width: 100%;
             z-index: 1030;
+            background-color: #34414b !important;
+            border-bottom: 2px solid #34414b;
+            padding: 0.5rem 1rem;
         }
         body {
             padding-top: 56px;
@@ -29,6 +32,62 @@
             padding: 6px 10px; /* Consistent padding */
             font-size: 14px; /* Consistent font size */
             line-height: 1.5; /* Ensure vertical alignment */
+        }
+        /* Make navbar text white */
+        .navbar-brand, 
+        .nav-link, 
+        .navbar .text-dark,
+        .navbar .welcome-text {
+            color: white !important;
+        }
+        /* Hover effects */
+        .navbar-brand:hover, 
+        .nav-link:hover {
+            color: #e9ecef !important;
+        }
+        /* Style for buttons in navbar */
+        .navbar .btn-secondary {
+            background-color: #6c757d;
+            border-color: #6c757d;
+        }
+        .navbar .btn-danger {
+            background-color: #dc3545;
+            border-color: #dc3545;
+        }
+        /* Footer styling */
+        footer {
+            background-color: #34414b !important;
+            border-top: 2px solid #34414b;
+            color: white;
+            text-align: center;
+            padding: 0.1rem 0;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            z-index: 1030;
+        }
+        /* Adjust container margin */
+        .container {
+            margin-bottom: 20px;
+        }
+        /* Footer text styling */
+        footer p {
+            margin-bottom: 0;
+            color: white !important;
+            font-size: 0.9rem;
+            line-height: 1;
+        }
+        /* Footer links if any */
+        footer a {
+            color: white !important;
+        }
+        footer a:hover {
+            color: #e9ecef !important;
+        }
+        /* Update footer class */
+        footer.py-3 {
+            padding-top: 0.1rem !important;
+            padding-bottom: 0.1rem !important;
         }
     </style>
 </head>
@@ -83,7 +142,7 @@
     </div>
 
     <!-- Footer -->
-    <footer class="bg-dark text-white text-center py-3 mt-4">
+    <footer class="py-3">
         <div class="container">
             <p class="mb-0">&copy; {{ now|date:"Y" }} SnapTrace.com. All Rights Reserved.</p>
         </div>
@@ -96,16 +155,15 @@
 
 <style>
     .home-text-gap {
-        margin-left: 20px; /* Adjust this value for desired spacing */
+        margin-left: 20px;
     }
     .container {
-        margin-bottom: 100px; /* Add spacing between container and footer */
+        margin-bottom: 15px;
     }
 
     footer {
-        margin-top: 0px; /* Optional: Add spacing above the footer */
+        margin-top: 0px;
     }
-
 </style>
 
 

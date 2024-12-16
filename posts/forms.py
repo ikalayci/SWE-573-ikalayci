@@ -3,15 +3,11 @@ from .models import Post, Tag
 
 
 class PostCreationForm(forms.ModelForm):
-    tags = forms.CharField(
-        max_length=200,
+    tags_with_links = forms.CharField(
+        widget=forms.HiddenInput(),
         required=False,
-        widget=forms.TextInput(attrs={
-            'placeholder': 'Comma-separated tags',
-            'class': 'form-control',
-        })
+        help_text="JSON containing tags and their Wikidata IDs."
     )
-
     title = forms.CharField(
         max_length=255,
         required=True,
@@ -26,13 +22,12 @@ class PostCreationForm(forms.ModelForm):
             'class': 'form-control',
             'placeholder': 'Write the story here...',
             'rows': 5,
-            'style': 'height: 405px;'  # Inline height adjustment
         })
     )
     image = forms.ImageField(
         required=False,
         widget=forms.ClearableFileInput(attrs={
-            'class': 'form-control'
+            'class': 'form-control',
         })
     )
     length = forms.FloatField(
@@ -73,54 +68,98 @@ class PostCreationForm(forms.ModelForm):
             'class': 'form-control',
         })
     )
-    price = forms.DecimalField(  # Add price field
+    price = forms.DecimalField(
         required=False,
         max_digits=10,
         decimal_places=2,
-        widget=forms.TextInput(attrs={
+        widget=forms.NumberInput(attrs={
             'placeholder': 'Enter the price of the object',
             'class': 'form-control',
         })
     )
+    time_period = forms.CharField(  # Optional time period
+        max_length=100,
+        required=False,
+        widget=forms.TextInput(attrs={
+            'placeholder': 'Enter time period (e.g., BC 500/01/15)',
+            'class': 'form-control',
+        })
+    )
+    materials = forms.CharField(
+        widget=forms.HiddenInput(),
+        required=False,
+        help_text="JSON string of selected materials."
+    )
+    shapes = forms.CharField(
+        widget=forms.HiddenInput(),
+        required=False,
+        help_text="Comma-separated string of selected shapes."
+    )
+    textures = forms.CharField(
+        widget=forms.HiddenInput(),
+        required=False,
+        help_text="Comma-separated string of selected textures."
+    )
 
     class Meta:
         model = Post
-        fields = ['title', 'content', 'image', 'tags', 'colors', 'length', 'width', 'height', 'weight', 'price']
+        fields = [
+            'title', 'content', 'image', 'tags_with_links', 'colors',
+            'length', 'width', 'height', 'weight', 'price', 'era', 'time_period',
+            'materials', 'shapes', 'textures'
+        ]
         widgets = {
-            'title': forms.TextInput(attrs={
-                'class': 'form-control',
-                'placeholder': 'Enter the title of your post',
-            }),
-            'content': forms.Textarea(attrs={
-                'class': 'form-control',
-                'placeholder': 'Write the story here...',
-                'rows': 5,
-            }),
-            'image': forms.ClearableFileInput(attrs={
-                'class': 'form-control',
-            }),
             'colors': forms.TextInput(attrs={
                 'class': 'form-control',
                 'placeholder': 'Enter colors (comma-separated)',
             }),
+            'era': forms.Select(choices=[('AC', 'AC'), ('BC', 'BC')], attrs={'class': 'form-control'}),
+            'time_period': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Specify time period'}),
+            'materials': forms.HiddenInput(),
+            'textures': forms.TextInput(attrs={'placeholder': 'Enter textures separated by commas'})
         }
+
+    def clean_length(self):
+        length = self.cleaned_data.get('length')
+        if length and length < 0:
+            raise forms.ValidationError("Length cannot be negative.")
+        return length
+
+    def clean_width(self):
+        width = self.cleaned_data.get('width')
+        if width and width < 0:
+            raise forms.ValidationError("Width cannot be negative.")
+        return width
+
+    def clean_height(self):
+        height = self.cleaned_data.get('height')
+        if height and height < 0:
+            raise forms.ValidationError("Height cannot be negative.")
+        return height
 
     def save(self, commit=True, user=None):
         post = super().save(commit=False)
         if user:
             post.user = user
         if commit:
-            # Save the post first to ensure it has a valid ID
             post.save()
-
-            # Handle tags after saving the post
-            tags_input = self.cleaned_data.get('tags', '')
-            if tags_input:
-                tag_names = [name.strip() for name in tags_input.split(',')]
-                for name in tag_names:
-                    if name:
-                        tag, created = Tag.objects.get_or_create(name=name)
-                        post.tags.add(tag)
-
+            post.shapes = self.cleaned_data.get('shapes', '')
+            post.save()
+            #post.textures = self.cleaned_data.get('textures', '')  # Save textures
+            #post.save()
+            tags_with_links_data = self.cleaned_data.get('tags_with_links', '[]')
+            try:
+                tags = json.loads(tags_with_links_data)
+                for tag in tags:
+                    name, wikidata_id = tag.get('label'), tag.get('id')
+                    if name and wikidata_id:
+                        tag_obj, _ = Tag.objects.get_or_create(
+                            name=name,
+                            defaults={'wikidata_id': wikidata_id}
+                        )
+                        post.tags.add(tag_obj)
+            except json.JSONDecodeError:
+                pass
         return post
+
 

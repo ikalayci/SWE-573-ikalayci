@@ -1,0 +1,207 @@
+                <div class="border p-3" 
+                    style="border: none !important; border-radius: 15px; background-color: #fff; margin-top: 0%; margin-left: 0px; width: 630px;">
+                    
+
+                    <!-- Materials of the Object Wrapper -->
+                    <div class="border p-3" style="border: 2px solid #ccc; border-radius: 15px; background-color: #fff; margin-top: 10px;">
+                        <h3 class="text-center mb-3" style="font-size: 18px;">Materials of the Object</h3>
+                        <input type="hidden" name="materials" id="hidden-materials" value="[]">
+                        <div class="d-flex justify-content-start">
+                            <!-- Natural Materials -->
+                            <div class="border p-3 mb-2" style="border: 1px solid #ddd; border-radius: 10px; margin-right: 10px; width: 300px;">
+                                <h4>1. Natural Materials</h4>
+
+                                <!-- Organic -->
+                                <div class="mb-3">
+                                    <h5>Organic:</h5>
+                                    <div>
+                                        <label><input type="checkbox" name="materials[]" value="Wood"> Wood</label><br>
+                                        <label><input type="checkbox" name="materials[]" value="Bamboo"> Bamboo</label><br>
+                                        <label><input type="checkbox" name="materials[]" value="Cotton"> Cotton</label><br>
+                                        <label><input type="checkbox" name="materials[]" value="Leather"> Leather</label><br>
+                                        <label><input type="checkbox" name="materials[]" value="Wool"> Wool</label><br>
+                                        <label><input type="checkbox" name="materials[]" value="Natural rubber"> Natural rubber</label><br>
+                                        <label><input type="checkbox" name="materials[]" value="Cork"> Cork</label>
+                                    </div>
+                                </div>
+
+                                <!-- Inorganic -->
+                                <div class="mb-3">
+                                    <h5>Inorganic:</h5>
+                                    <div>
+                                        <label><input type="checkbox" name="materials[]" value="Stone"> Stone (e.g., granite, marble)</label><br>
+                                        <label><input type="checkbox" name="materials[]" value="Clay"> Clay</label><br>
+                                        <label><input type="checkbox" name="materials[]" value="Sand"> Sand</label><br>
+                                        <label><input type="checkbox" name="materials[]" value="Minerals"> Minerals (e.g., quartz, feldspar)</label><br>
+                                        <label><input type="checkbox" name="materials[]" value="Natural metals"> Natural metals (e.g., gold, silver)</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Metals -->
+                            <div class="border p-3 mb-2" style="border: 1px solid #ddd; border-radius: 10px; width: 300px;">
+                                <h4>2. Metals</h4>
+
+                                <!-- Ferrous Metals -->
+                                <div class="mb-3">
+                                    <h5>Ferrous Metals:</h5>
+                                    <div>
+                                        <label><input type="checkbox" name="materials[]" value="Steel"> Steel</label><br>
+                                        <label><input type="checkbox" name="materials[]" value="Cast iron"> Cast iron</label><br>
+                                        <label><input type="checkbox" name="materials[]" value="Wrought iron"> Wrought iron</label>
+                                    </div>
+                                </div>
+
+                                <!-- Non-Ferrous Metals -->
+                                <div class="mb-3">
+                                    <h5>Non-Ferrous Metals:</h5>
+                                    <div>
+                                        <label><input type="checkbox" name="materials[]" value="Aluminum"> Aluminum</label><br>
+                                        <label><input type="checkbox" name="materials[]" value="Copper"> Copper</label><br>
+                                        <label><input type="checkbox" name="materials[]" value="Brass"> Brass</label><br>
+                                        <label><input type="checkbox" name="materials[]" value="Bronze"> Bronze</label><br>
+                                        <label><input type="checkbox" name="materials[]" value="Titanium"> Titanium</label><br>
+                                        <label><input type="checkbox" name="materials[]" value="Nickel"> Nickel</label><br>
+                                        <label><input type="checkbox" name="materials[]" value="Zinc"> Zinc</label><br>
+                                        <label><input type="checkbox" name="materials[]" value="Gold"> Gold</label><br>
+                                        <label><input type="checkbox" name="materials[]" value="Silver"> Silver</label><br>
+                                        <label><input type="checkbox" name="materials[]" value="Platinum"> Platinum</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-start">
+                            <!-- Polymers -->
+                            <div class="border p-3 mb-2" style="border: 1px solid #ddd; border-radius: 10px; margin-right: 10px; width: 350px;">
+                                <h4>3. Polymers (Plastics)</h4>
+
+                                <!-- Thermoplastics -->
+                                <div class="mb-3">
+                                    <h5>Thermoplastics:</h5>
+                                    <div>
+                                        <label><input type="checkbox" name="materials[]" value="Polyethylene"> Polyethylene (PE)</label><br>
+                                        <label><input type="checkbox" name="materials[]" value="Polypropylene"> Polypropylene (PP)</label><br>
+                                        <label><input type="checkbox" name="materials[]" value="Polyvinyl chloride"> Polyvinyl chloride (PVC)</label><br>
+                                        <label><input type="checkbox" name="materials[]" value="Polystyrene"> Polystyrene (PS)</label><br>
+                                        <label><input type="checkbox" name="materials[]" value="Nylon"> Nylon</label>
+                                    </div>
+                                </div>
+
+                                <!-- Thermosets -->
+                                <div class="mb-3">
+                                    <h5>Thermosets:</h5>
+                                    <div>
+                                        <label><input type="checkbox" name="materials[]" value="Epoxy"> Epoxy</label><br>
+                                        <label><input type="checkbox" name="materials[]" value="Phenolic resin"> Phenolic resin</label><br>
+                                        <label><input type="checkbox" name="materials[]" value="Polyurethane"> Polyurethane</label><br>
+                                        <label><input type="checkbox" name="materials[]" value="Silicone"> Silicone</label>
+                                    </div>
+                                </div>
+
+                                <!-- Elastomers -->
+                                <div class="mb-3">
+                                    <h5>Elastomers:</h5>
+                                    <div>
+                                        <label><input type="checkbox" name="materials[]" value="Synthetic rubber"> Synthetic rubber</label><br>
+                                        <label><input type="checkbox" name="materials[]" value="Neoprene"> Neoprene</label><br>
+                                        <label><input type="checkbox" name="materials[]" value="Latex"> Latex</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div>
+                                <!-- Ceramics -->
+                                <div class="border p-3 mb-2" style="border: 1px solid #ddd; border-radius: 10px; width: 277px;">
+                                    <h4>4. Ceramics</h4>
+                                    <div>
+                                        <label><input type="checkbox" name="materials[]" value="Porcelain"> Porcelain</label><br>
+                                        <label><input type="checkbox" name="materials[]" value="Glass"> Glass</label><br>
+                                        <label><input type="checkbox" name="materials[]" value="Brick"> Brick</label><br>
+                                        <label><input type="checkbox" name="materials[]" value="Tile"> Tile</label><br>
+                                        <label><input type="checkbox" name="materials[]" value="Advanced ceramics"> Advanced ceramics (e.g., silicon carbide, alumina)</label>
+                                    </div>
+                                </div>
+                                <!-- Composites -->
+                                <div class="border p-3 mb-2" style="border: 1px solid #ddd; border-radius: 10px; ">
+                                    <h4>5. Composites</h4>
+                                    <div>
+                                        <label><input type="checkbox" name="materials[]" value="Carbon fiber"> Carbon fiber-reinforced plastic (CFRP)</label><br>
+                                        <label><input type="checkbox" name="materials[]" value="Fiberglass"> Fiberglass</label><br>
+                                        <label><input type="checkbox" name="materials[]" value="Concrete"> Concrete</label><br>
+                                        <label><input type="checkbox" name="materials[]" value="Plywood"> Plywood</label><br>
+                                        <label><input type="checkbox" name="materials[]" value="Laminates"> Laminates</label><br>
+                                        <label><input type="checkbox" name="materials[]" value="Kevlar composites"> Kevlar composites</label>
+                                    </div>
+                                </div>
+                                <!-- Alloys -->
+                                <div class="border p-3 mb-2" style="border: 1px solid #ddd; border-radius: 10px; ">
+                                    <h4>6. Alloys</h4>
+                                    <div>
+                                        <label><input type="checkbox" name="materials[]" value="Stainless steel"> Stainless steel</label><br>
+                                        <label><input type="checkbox" name="materials[]" value="Brass"> Brass (copper and zinc)</label><br>
+                                        <label><input type="checkbox" name="materials[]" value="Bronze"> Bronze (copper and tin)</label><br>
+                                        <label><input type="checkbox" name="materials[]" value="Alloyed aluminum"> Alloyed aluminum</label>
+                                    </div>
+                                </div>
+                            </div>    
+                        </div>
+                            
+                        <div class="d-flex justify-content-start">
+                            <!-- Advanced Materials -->
+                            <div class="border p-3 mb-2" style="border: 1px solid #ddd; border-radius: 10px; margin-right: 10px; width: 465px;">
+                                <h4>7. Advanced Materials</h4>
+                                <div>
+                                    <label><input type="checkbox" name="materials[]" value="Shape-memory alloys"> Shape-memory alloys (e.g., Nitinol)</label><br>
+                                    <label><input type="checkbox" name="materials[]" value="Piezoelectric materials"> Piezoelectric materials</label><br>
+                                    <label><input type="checkbox" name="materials[]" value="Thermochromic materials"> Thermochromic materials</label><br>
+                                    <label><input type="checkbox" name="materials[]" value="Photovoltaic materials"> Photovoltaic materials (e.g., solar cells)</label><br>
+                                    <label><input type="checkbox" name="materials[]" value="Nanomaterials"> Nanomaterials</label><br>
+                                    <label><input type="checkbox" name="materials[]" value="Carbon nanotubes"> Carbon nanotubes</label><br>
+                                    <label><input type="checkbox" name="materials[]" value="Graphene"> Graphene</label><br>
+                                    <label><input type="checkbox" name="materials[]" value="Quantum dots"> Quantum dots</label>
+                                </div>
+                            </div>
+                            <div>                           
+                                <!-- Biomaterials -->
+                                <div class="border p-3 mb-2" style="border: 1px solid #ddd; border-radius: 10px; width: 277px;">
+                                    <h4>8. Biomaterials</h4>
+                                    <div>
+                                        <label><input type="checkbox" name="materials[]" value="Biocompatible polymers"> Biocompatible polymers (e.g., PMMA for implants)</label><br>
+                                        <label><input type="checkbox" name="materials[]" value="Titanium"> Titanium for prosthetics</label><br>
+                                        <label><input type="checkbox" name="materials[]" value="Bioactive ceramics"> Bioactive ceramics (e.g., hydroxyapatite)</label>
+                                    </div>
+                                </div>
+
+                                <!-- Others -->
+                                <div class="border p-3 mb-2" style="border: 1px solid #ddd; border-radius: 10px;">
+                                    <h4>9. Others</h4>
+                                    <div>
+                                        <label><input type="checkbox" name="materials[]" value="Foams"> Foams: Styrofoam, memory foam</label><br>
+                                        <label><input type="checkbox" name="materials[]" value="Textiles"> Textiles: Polyester, nylon, silk</label><br>
+                                        <label><input type="checkbox" name="materials[]" value="Recycled materials"> Recycled materials: Reclaimed wood, recycled plastics</label>
+                                        <label><input type="checkbox" name="materials[]" value="Other"> Other</label>
+                                    </div>
+                                </div>
+                            </div>    
+                        </div>
+                        <div class="d-flex align-items-center">
+                            <div class="d-flex align-items-center">
+                                <!-- Assign Materials Button -->
+                                <button 
+                                    type="button" 
+                                    class="btn btn-primary mt-3" 
+                                    style="height: 45px; width: 200px;"
+                                    onclick="assignMaterials()">Assign Materials
+                                </button>
+                            </div>
+                            <strong class="text-muted" style="margin-left: 100px;">Assigned Materials:</strong>
+                        </div>
+                            <!-- Assigned Material Buttons Section -->
+                            <div class="d-flex align-items-start mt-2" style="height: 200px;">
+                                <!-- Material Buttons Container -->
+                                <div id="materials-container" class="d-flex flex-wrap"></div>
+
+                                <!-- Remove Button Container -->
+                                <div id="remove-button-container"></div>
+                            </div>
+                    </div>
+                </div>

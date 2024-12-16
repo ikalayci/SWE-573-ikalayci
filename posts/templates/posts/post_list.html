@@ -1,11 +1,11 @@
 {% extends "posts/base.html" %}
+{% load static %}
 
 {% block content %}
-<h2 class="text-center mb-4">Mysterious Objects</h2>
+<h2 class="text-center mb-1">Mysterious Objects</h2>
 
 <!-- Display Add Post button -->
-<div class="d-flex justify-content-between mb-3">
-    <!-- Left-aligned Add Post button -->
+<div class="d-flex justify-content-between mb-1">
     <div>
         {% if user.is_authenticated %}
             <a href="{% url 'create_post' %}" class="btn btn-secondary">Add Post</a>
@@ -13,166 +13,259 @@
     </div>
 </div>
 
-{% for post in posts %}
-    <div class="card mb-4">
-        <div class="card-body">
-            <h5 class="card-title">{{ post.user.username }}</h5>
-            <!-- Timestamp -->
-            <small class="text-muted">Posted on {{ post.created_at }}</small>
-            <!-- Title -->
-            <h3 class="card-title text-center mb-3">
-                {{ post.title|default:"(No Title)" }}
-            </h3>
-            <!-- Image -->
-            {% if post.image %}
-            <div class="image-frame mt-3">
-                <img src="{{ post.image.url }}" alt="Image for {{ post.content }}" class="img-fluid">
-            </div>
-            {% endif %}
-
-            <!-- text -->
-            <p class="card-text">{{ post.content }}</p>
-
-            <!-- Tags -->
-            <div class="d-flex align-items-center mt-3">
-                <strong class="me-2" tyle="width: 60px;">Tags:</strong> 
-                <strong class="me-2" style="width: 40px; margin-left: 70px;">:</strong>
-                {% if post.tags.exists %}
-                    {% for tag in post.tags.all %}
-                        <button type="button" class="btn btn-outline-primary btn-sm me-2">
-                            <a href="{% url 'tag_detail' tag.name %}" style="text-decoration: none; color: inherit;">{{ tag.name }}</a>
-                        </button>
-                    {% endfor %}
-                {% else %}
-                    <span class="text-muted">Not Specified!</span>
-                {% endif %}
-                </p>
-            </div>
-            <!-- Colors -->           
-            <div class="d-flex align-items-center mt-3">
-                <strong class="me-2" style="width: 60px;">Colors</strong>
-                <strong class="me-2" style="width: 40px; margin-left: 50px;">:</strong>
-                {% if post.split_colors %}
-                    {% for color in post.split_colors %}
-                        <button class="btn btn-outline-primary me-2 mb-2" disabled>{{ color }}</button>
-                    {% endfor %}
-                {% else %}
-                    <span class="text-muted">Not Specified!</span>
-                {% endif %}
-            </div>
-
-            <!-- Sizes Section -->
-            <div class="mt-3">
-                <strong>Size Information:</strong>
-                <div class="mt-2">
-                    <!-- Length -->
-                    <div class="d-flex align-items-center mb-2">
-                        <strong class="me-2" style="width: 60px;">Length</strong>
-                        <strong class="me-2" style="width: 40px;">[cm]:</strong>
-                        {% if post.length %}
-                            <button class="btn btn-outline-primary btn-sm" style="width: 100px;">{{ post.length }}</button>
-                        {% else %}
-                            <span class="text-muted">Not Specified!</span>
-                        {% endif %}
-                    </div>
-
-                    <!-- Width -->
-                    <div class="d-flex align-items-center mb-2">
-                        <strong class="me-2" style="width: 60px;">Width</strong>
-                        <strong class="me-2" style="width: 40px;">[cm]:</strong>
-                        {% if post.width %}
-                            <button class="btn btn-outline-primary btn-sm" style="width: 100px;">{{ post.width }}</button>
-                        {% else %}
-                            <span class="text-muted">Not Specified!</span>
-                        {% endif %}
-                    </div>
-
-                    <!-- Height -->
-                    <div class="d-flex align-items-center">
-                        <strong class="me-2" style="width: 60px;">Height</strong>
-                        <strong class="me-2" style="width: 40px;">[cm]:</strong>
-                        {% if post.height %}
-                            <button class="btn btn-outline-primary btn-sm" style="width: 100px;">{{ post.height }}</button>
-                        {% else %}
-                            <span class="text-muted">Not Specified!</span>
-                        {% endif %}
-                    </div>
+<!-- Posts Grid -->
+<div class="row row-cols-1 row-cols-md-3">
+    {% for post in posts %}
+        <div class="col">
+            <div class="card">
+                <!-- Status button -->
+                <div class="status-button">
+                    <button class="btn btn-danger btn-sm">Unsolved</button>
                 </div>
-            </div>
+                
+                <!-- Card Header Section -->
+                <div class="card-header-section">
+                    <!-- User Info with Profile Picture -->
+                    <div class="d-flex align-items-center mb-2">
+                        <div class="me-3">
+                            <a href="{% url 'user_profile' post.user.username %}">
+                                {% if post.user_profile_pic %}
+                                    <img src="{{ post.user_profile_pic.url }}" 
+                                         alt="Profile picture" 
+                                         class="rounded-circle"
+                                         style="width: 40px; height: 40px; object-fit: cover;">
+                                {% else %}
+                                    <img src="{% static 'images/default_profile.png' %}" 
+                                         alt="Default profile picture" 
+                                         class="rounded-circle"
+                                         style="width: 40px; height: 40px; object-fit: cover;">
+                                {% endif %}
+                            </a>
+                        </div>
+                        <div>
+                            <h5 class="card-title mt-1">
+                                <a href="{% url 'user_profile' post.user.username %}" 
+                                   class="text-decoration-none text-dark">
+                                    {{ post.user.username }}
+                                </a>
+                            </h5>
+                            <small class="text-muted">Posted on {{ post.created_at }}</small>
+                        </div>
+                    </div>
 
-            <!-- Weight Section -->
-            <div class="d-flex align-items-center mt-3">
-                <strong class="me-2" style="width: 60px;">Weight</strong>
-                <strong class="me-2" style="width: 40px;">[g]:</strong>
-                {% if post.weight %}
-                    <button class="btn btn-outline-primary btn-sm" style="width: 100px;">{{ post.weight|default:"Not specified" }}</button>
-                {% else %}
-                    <span class="text-muted">Not Specified!</span>
-                {% endif %}
-            </div>
+                    <!-- Title -->
+                    <h3 class="card-title text-center mb-3">{{ post.title|default:"(No Title)" }}</h3>
+                </div>
 
-            <!-- Price -->
-            <div class="d-flex align-items-center mb-2">
-                <strong class="me-2" style="width: 60px;">Price</strong>
-                <strong class="me-2" style="width: 40px;">[$]:</strong>
-                {% if post.price %}
-                    <button class="btn btn-outline-primary btn-sm" style="width: 100px;">{{ post.price }}</button>
-                {% else %}
-                    <span class="text-muted">Not Specified!</span>
-                {% endif %}
-            </div>
+                <!-- Card Body (Image) -->
+                <div class="card-body">
+                    <!-- Image -->
+                    {% if post.image %}
+                        <div class="image-frame mt-3">
+                            <img src="{{ post.image.url }}" alt="Image for {{ post.content }}" class="img-fluid">
+                        </div>
+                    {% else %}
+                        <p class="text-muted">No image available</p>
+                    {% endif %}
 
-
-            <h6 class="mt-4">Comments:</h6>
-            {% for comment in post.comments.all %}
-                <div class="ml-3">
-                    <p>
-                        <strong>
-                            {% if comment.user %}
-                                {{ comment.user.username }}
+                    <!-- Display Tags -->
+                    <div class="tags-container">
+                        <strong>Tags:</strong>
+                        <div class="ms-2 d-inline-block">
+                            {% if post.tags.all %}
+                                {% for tag in post.tags.all %}
+                                    <a href="https://www.wikidata.org/wiki/{{ tag.wikidata_id }}" 
+                                       target="_blank" 
+                                       class="btn btn-outline-primary btn-sm tag-btn">
+                                        {{ tag.name }}
+                                    </a>
+                                {% endfor %}
                             {% else %}
-                                Anonymous
+                                <span class="text-muted">Not Specified!</span>
                             {% endif %}
-                        </strong>: {{ comment.content }}
-                    </p>
-                    <small class="text-muted">Commented on {{ comment.created_at }}</small>
-                </div>
-            {% empty %}
-                <p class="ml-3">No comments yet.</p>
-            {% endfor %}
+                        </div>
+                    </div>
 
-            <!-- Comment form -->
-            <form action="{% url 'add_comment' post.id %}" method="post" class="mt-3">
-                {% csrf_token %}
-                <div class="form-group">
-                    <textarea name="content" rows="2" placeholder="Add a comment..." required class="form-control"></textarea>
+                    <!-- text -->
+                    <p class="card-text mt-3">{{ post.content }}</p>
                 </div>
-                <button type="submit" class="btn btn-secondary">Comment</button>
-            </form>
+
+                <!-- Card Footer Section -->
+                <div class="card-footer-section">
+                    <!-- View Details Button -->
+                    <div class="button-container">
+                        <a href="{% url 'post_detail' post.id %}" class="btn btn-secondary btn-sm">View Details</a>
+                    </div>
+                </div>
+            </div>
         </div>
-    </div>
-{% empty %}
-    <p>No posts yet. Be the first to <a href="{% url 'create_post' %}" class="btn btn-secondary">create one</a>!</p>
-{% endfor %}
+    {% empty %}
+        <div class="col-12">
+            <p>No posts yet. Be the first to <a href="{% url 'create_post' %}" class="btn btn-secondary">create one</a>!</p>
+        </div>
+    {% endfor %}
+</div>
 
 <!-- Custom CSS for Image Frame -->
 <style>
-    /* Center the image frame within the card */
     .image-frame {
-        width: 720px;
-        height: 480px;
+        width: 100%;
+        height: 320px;
         overflow: hidden;
         position: relative;
         background-color: #f0f0f0;
-        margin: 0 auto; /* Centers the frame horizontally */
+        margin: 0 auto;
+        border-radius: 15px;
+        padding: 5px;
+        border: 2px solid #34414b;
     }
 
-    /* Style for the image to fit within the frame without cropping */
     .image-frame img {
-        width: 100%;
-        height: 100%;
+        width: calc(100% - 10px);
+        height: calc(100% - 10px);
         object-fit: contain;
         object-position: center;
+        border-radius: 12px;
+        margin: 5px;
+        border: 1px solid #f0f0f0;
+    }
+
+    /* Card and content styling */
+    .card {
+        height: 660px !important;
+        position: relative;
+        margin-bottom: 30px;
+    }
+
+    .card-body {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        padding: 15px;
+        background-color: white;
+        border-left: 2px solid #34414b;
+        border-right: 2px solid #34414b;
+    }
+
+    /* Title styling */
+    .card-title {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        margin-bottom: 2px;
+        font-size: 1.4rem;
+        line-height: 1.2;
+        height: 1.8rem;
+    }
+
+    /* Tags container */
+    .tags-container {
+        height: 80px;
+        overflow: hidden;
+        margin: 2px 0;
+        padding: 2px 0;
+    }
+
+    /* Individual tag styling */
+    .tag-btn {
+        padding: 1px 8px;
+        margin: 0 4px 4px 0;
+        font-size: 0.8rem;
+        line-height: 1.4;
+        display: inline-block;
+    }
+
+    /* Text content */
+    .card-text {
+        height: 4.3rem;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        margin-bottom: 5px;
+        font-size: 0.9rem;
+        line-height: 1.5;
+    }
+
+    /* Button container */
+    .button-container {
+        text-align: right;
+        margin-top: auto;
+    }
+
+    /* Status button styling */
+    .status-button {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        z-index: 1;
+    }
+
+    .status-button .btn,
+    .button-container .btn {
+        font-size: 0.875rem;
+        padding: 0.25rem 0.5rem;
+        height: 31px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    /* Sticky header styling */
+    .sticky-header {
+        position: sticky;
+        top: 0;
+        background-color: white;
+        padding: 15px 0;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        z-index: 1000;
+        margin-bottom: 10px;
+    }
+
+    /* Add padding to main content */
+    .main-content {
+        padding-top: 10px;
+    }
+
+    .card-header-section {
+        background-color: #34414b;
+        border-top-left-radius: 5px;
+        border-top-right-radius: 5px;
+        padding: 5px 15px;
+        border: 2px solid #34414b;
+        border-bottom: none;
+    }
+
+    .card-footer-section {
+        background-color: #34414b;
+        border-bottom-left-radius: 5px;
+        border-bottom-right-radius: 5px;
+        padding: 10px 15px;
+        border: 2px solid #34414b;
+        border-top: none;
+    }
+
+    /* Make text in header section white for better contrast */
+    .card-header-section .card-title,
+    .card-header-section .text-muted,
+    .card-header-section a.text-decoration-none {
+        color: #fff !important;
+    }
+
+    /* User info adjustments */
+    .d-flex.align-items-center.mb-2 {
+        margin-bottom: 0 !important;
+    }
+
+    /* Update grid gap styling */
+    .row {
+        margin: 0 -15px;
+    }
+
+    .col {
+        padding: 0 15px;
+        margin-bottom: 40px;
     }
 </style>
 {% endblock %}

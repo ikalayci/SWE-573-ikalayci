@@ -1,5 +1,5 @@
 # accounts/views.py
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.contrib.auth.models import User
@@ -81,13 +81,21 @@ def home(request):
     return render(request, 'accounts/home.html')
 
 # Profile Page with Update Capability
-@login_required
 @csrf_exempt
-def profile_view(request):
-    user = request.user
-    profile, created = Profile.objects.get_or_create(user=user, defaults={"profession": "Unknown", "bio": "Unknown"})
-
+def profile_view(request, username=None):
+    if username:
+        profile_user = get_object_or_404(User, username=username)
+    else:
+        if not request.user.is_authenticated:
+            return redirect('login')
+        profile_user = request.user
+    
+    profile = profile_user.profile
+    
     if request.method == 'POST':
+        if not request.user.is_authenticated or request.user.id != profile_user.id:
+            return JsonResponse({'error': 'Unauthorized'}, status=401)
+            
         try:
             # Handle JSON data for text fields
             if request.content_type == "application/json":
@@ -97,17 +105,17 @@ def profile_view(request):
                 # Update username
                 if 'username' in data:
                     username = data['username']
-                    if username != user.username and User.objects.filter(username=username).exists():
+                    if username != request.user.username and User.objects.filter(username=username).exists():
                         return JsonResponse({'error': 'Username already exists'}, status=400)
-                    user.username = username
+                    request.user.username = username
                     updated_fields['username'] = username
 
                 # Update email
                 if 'email' in data:
                     email = data['email']
-                    if email != user.email and User.objects.filter(email=email).exists():
+                    if email != request.user.email and User.objects.filter(email=email).exists():
                         return JsonResponse({'error': 'Email already exists'}, status=400)
-                    user.email = email
+                    request.user.email = email
                     updated_fields['email'] = email
 
                 # Update profession
@@ -120,7 +128,14 @@ def profile_view(request):
                     profile.bio = data['bio'] or "Unknown"
                     updated_fields['bio'] = profile.bio
 
-                user.save()
+                # Update password
+                if 'current_password' in data and 'new_password' in data:
+                    if not request.user.check_password(data['current_password']):
+                        return JsonResponse({'error': 'Current password is incorrect'}, status=400)
+                    request.user.set_password(data['new_password'])
+                    updated_fields['password'] = 'updated'
+
+                request.user.save()
                 profile.save()
                 return JsonResponse(updated_fields)
 
@@ -138,10 +153,23 @@ def profile_view(request):
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=400)
 
-    # Render the profile page
-    return render(request, 'accounts/profile.html', {
-        'user': user,
+    context = {
+        'profile_user': profile_user,
         'profile': profile,
+        'debug': settings.DEBUG,
+        'is_own_profile': request.user.id == profile_user.id if request.user.is_authenticated else False
+    }
+    
+    return render(request, 'accounts/profile.html', context)
+
+def user_profile(request, username):
+    profile_user = get_object_or_404(User, username=username)
+    profile = get_object_or_404(Profile, user=profile_user)
+    
+    return render(request, 'accounts/profile.html', {
+        'profile_user': profile_user,
+        'profile': profile,
+        'is_own_profile': request.user == profile_user
     })
 
 
