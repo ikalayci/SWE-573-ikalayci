@@ -177,6 +177,7 @@
         margin-bottom: 5px;
         font-size: 0.9rem;
         line-height: 1.5;
+        color: #212529;
     }
 
     /* Button container */
@@ -308,6 +309,27 @@
         top: 10px;
         right: 10px;
         z-index: 1;
+    }
+
+    /* Add explicit text color for other text elements */
+    .card-body {
+        color: #212529;
+    }
+
+    .text-muted {
+        color: #6c757d !important;
+    }
+
+    /* Ensure proper color for links */
+    .card a:not(.btn) {
+        color: #0d6efd;
+    }
+
+    /* Override any inherited text colors in the card body */
+    .card-body p, 
+    .card-body div:not(.tags-container),
+    .card-body span:not(.text-muted) {
+        color: #212529;
     }
 </style>
 {% endblock %}

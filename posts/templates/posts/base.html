@@ -15,6 +15,9 @@
             background-color: #34414b !important;
             border-bottom: 2px solid #34414b;
             padding: 0.5rem 1rem;
+            height: 56px !important;
+            min-height: 56px !important;
+            padding: 0 20px !important;
         }
         body {
             padding-top: 56px;
@@ -182,17 +185,34 @@
         /* Update search container positioning */
         .search-container {
             position: relative;
-            width: 500px; /* Fixed width */
-            margin: 0 auto;
-            z-index: 1100;
+            width: 100%; /* Changed from 500px to 100% */
+            display: flex;
+            justify-content: center;
         }
 
-        /* Center search form container */
+        /* Update search form styling */
+        .search-container .d-flex {
+            width: 600px; /* Fixed width for the form */
+            position: relative;
+        }
+
+        /* Style the search input */
+        .search-container .form-control {
+            flex: 1;  /* Allow input to take available space */
+        }
+
+        /* Group the buttons together */
+        .search-button-group {
+            display: flex;
+            gap: 8px;  /* Space between buttons */
+            margin-left: auto;  /* Push buttons to the right */
+        }
+
+        /* Remove the search-form-container class styles as they're no longer needed */
         .search-form-container {
-            position: absolute;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 500px; /* Match search-container width */
+            position: static;
+            transform: none;
+            width: auto;
         }
 
         /* Add these navbar button styles to the top of your existing styles */
@@ -236,14 +256,314 @@
         .navbar .me-1 {
             margin-right: 0.25rem !important;
         }
+
+        .advanced-search-panel {
+            display: none;
+            position: fixed;
+            top: 56px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-100%);
+            width: 70%;
+            max-width: 1000px !important;
+            background-color: #34414b;
+            color: white;
+            padding: 20px;
+            z-index: 1029;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease-in-out;
+            border-radius: 0 0 8px 8px;
+        }
+
+        .advanced-search-panel.show {
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .advanced-search-form label {
+            color: white;
+        }
+
+        .advanced-search-form .form-control {
+            background-color: #5d7082;
+            border-color: #34414b;
+            color: white;
+        }
+
+        .advanced-search-form .form-control:focus {
+            background-color: #6d8092;
+            color: white;
+        }
+
+        .advanced-search-form .form-control::placeholder {
+            color: #d0d6dc;
+        }
+
+        /* Update search input and button heights */
+        .search-container .form-control,
+        .search-container .btn {
+            height: 38px !important;  /* Increased from 31px to 38px to match Add Post button */
+            padding-top: 6px !important;  /* Adjusted padding */
+            padding-bottom: 6px !important;
+            line-height: 1.5 !important;
+            font-size: 14px !important;
+        }
+
+        /* Ensure vertical alignment */
+        .search-container .d-flex {
+            align-items: center;
+        }
+
+        /* Adjust search input padding */
+        .search-container .form-control {
+            padding: 6px 12px !important;  /* Adjusted padding */
+        }
+
+        /* Ensure consistent button styling */
+        .search-container .btn {
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+        }
+
+        /* Update the Advanced Search button width */
+        #advancedSearchBtn {
+            min-width: 140px !important;  /* Increased from 120px to 140px */
+            padding-left: 15px !important;
+            padding-right: 15px !important;
+            white-space: nowrap !important;  /* Prevent text wrapping */
+        }
+
+        /* Update navbar layout styles */
+        .container-fluid {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 1rem;
+        }
+
+        .navbar-left {
+            flex: 0 0 auto;
+        }
+
+        .navbar-center {
+            flex: 0 1 auto;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .navbar-right {
+            flex: 0 0 auto;
+        }
+
+        /* Update search container styles */
+        .search-container {
+            width: auto;
+            min-width: 500px;
+        }
+
+        .search-form-container {
+            position: relative;
+            width: 100%;
+        }
+
+        /* Ensure search form doesn't overflow on smaller screens */
+        @media (max-width: 1200px) {
+            .navbar-center {
+                position: relative;
+                left: auto;
+                transform: none;
+                margin: 0 1rem;
+            }
+
+            .search-container {
+                min-width: 300px;
+            }
+        }
+
+        /* Fixed navbar size and positioning */
+        .navbar {
+            height: 56px !important;
+            min-height: 56px !important;
+            padding: 0 20px !important;
+        }
+
+        /* Container sizing */
+        .container-fluid {
+            max-width: 1920px !important;
+            margin: 0 auto !important;
+            height: 100% !important;
+        }
+
+        /* Left section sizing */
+        .navbar-left {
+            width: 400px !important;
+            flex: 0 0 400px !important;
+        }
+
+        /* Center section sizing */
+        .navbar-center {
+            width: 800px !important;
+            position: absolute !important;
+            left: 50% !important;
+            transform: translateX(-50%) !important;
+        }
+
+        /* Right section sizing */
+        .navbar-right {
+            width: 400px !important;
+            flex: 0 0 400px !important;
+        }
+
+        /* Search container fixed width */
+        .search-container {
+            width: 800px !important;
+            min-width: 800px !important;
+        }
+
+        /* Fixed button sizes */
+        .navbar .btn {
+            height: 38px !important;
+            padding: 0 15px !important;
+            font-size: 14px !important;
+            line-height: 36px !important;
+            white-space: nowrap !important;
+        }
+
+        /* Fixed input size */
+        .search-container .form-control {
+            height: 38px !important;
+            font-size: 14px !important;
+            padding: 0 12px !important;
+        }
+
+        /* Profile picture fixed size */
+        .navbar .rounded-circle {
+            width: 38px !important;
+            height: 38px !important;
+            flex: 0 0 38px !important;
+        }
+
+        /* Text sizes */
+        .navbar-brand {
+            font-size: 20px !important;
+            white-space: nowrap !important;
+        }
+
+        .navbar-text {
+            font-size: 14px !important;
+            white-space: nowrap !important;
+        }
+
+        /* Ensure buttons maintain size */
+        #advancedSearchBtn {
+            width: 140px !important;
+            flex: 0 0 140px !important;
+        }
+
+        /* Media queries for responsive layout */
+        @media (max-width: 1600px) {
+            .navbar-center {
+                width: 600px !important;
+            }
+            
+            .search-container {
+                width: 600px !important;
+                min-width: 600px !important;
+            }
+        }
+
+        @media (max-width: 1400px) {
+            .navbar-left {
+                width: 350px !important;
+                flex: 0 0 350px !important;
+            }
+
+            .navbar-right {
+                width: 350px !important;
+                flex: 0 0 350px !important;
+            }
+        }
+
+        @media (max-width: 1200px) {
+            .navbar-center {
+                position: relative !important;
+                left: auto !important;
+                transform: none !important;
+                width: 100% !important;
+            }
+
+            .search-container {
+                width: 100% !important;
+                min-width: 200px !important;
+            }
+
+            .navbar-left, .navbar-right {
+                width: auto !important;
+                flex: 0 0 auto !important;
+            }
+        }
+
+        /* Ensure spacing remains consistent */
+        .me-1, .me-2, .me-3, .ms-1, .ms-2, .ms-3 {
+            margin-left: 8px !important;
+            margin-right: 8px !important;
+        }
+
+        /* Fix search suggestions positioning */
+        #searchSuggestions {
+            position: absolute !important;
+            top: 100% !important;
+            width: 100% !important;
+            z-index: 1100 !important;
+        }
+
+        /* Add some padding to the form inside */
+        .advanced-search-form {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 15px;
+        }
+
+        /* Adjust media queries for the panel */
+        @media (max-width: 1200px) {
+            .advanced-search-panel {
+                width: 80%;
+                max-width: 800px !important;
+            }
+        }
+
+        @media (max-width: 992px) {
+            .advanced-search-panel {
+                width: 90%;
+                max-width: 600px !important;
+            }
+        }
+
+        /* Update the styles for Categorized Information section */
+        .advanced-search-form .btn-sm {
+            height: 31px !important;
+            padding: 0 8px !important;
+            font-size: 12px !important;
+            line-height: 29px !important;
+            min-width: 60px !important;
+        }
+
+        .advanced-search-form .gap-2 {
+            gap: 0.5rem !important;
+        }
+
+        /* Keep the input container width at 90% */
+        .categorized-input-container {
+            width: 90% !important;
+        }
     </style>
 </head>
 <body>
     <!-- Fixed Navigation Bar -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container-fluid">
-            <!-- Left side: Home, Website Name, and Add Post -->
-            <div class="d-flex align-items-center">
+            <!-- Left section -->
+            <div class="navbar-left d-flex align-items-center">
                 <a href="{% url 'posts:post_list' %}" class="btn btn-outline-light me-2">Home</a>
                 <span class="navbar-brand mb-0 h1 home-text-gap">SnapTrace.com</span>
                 {% if user.is_authenticated %}
@@ -251,28 +571,34 @@
                 {% endif %}
             </div>
 
-            <!-- Center: Search Form -->
-            <div class="search-form-container">
-                <div class="search-container">
-                    <form class="d-flex w-100" method="GET" action="{% url 'posts:post_list' %}">
-                        <input 
-                            class="form-control me-2" 
-                            type="search" 
-                            placeholder="Search posts..." 
-                            aria-label="Search"
-                            name="q"
-                            id="searchInput"
-                            autocomplete="off">
-                        <button class="btn btn-outline-light" type="submit">Search</button>
-                    </form>
-                    <div id="searchSuggestions"></div>
+            <!-- Center section - Search -->
+            <div class="navbar-center">
+                <div class="search-form-container">
+                    <div class="search-container">
+                        <form class="d-flex" method="GET" action="{% url 'posts:post_list' %}">
+                            <input 
+                                class="form-control me-2" 
+                                type="search" 
+                                placeholder="Search posts..." 
+                                aria-label="Search"
+                                name="q"
+                                id="searchInput"
+                                autocomplete="off">
+                            <div class="search-button-group">
+                                <button class="btn btn-outline-light" type="submit">Search</button>
+                                <button type="button" class="btn btn-outline-light" id="advancedSearchBtn">
+                                    Advanced Search
+                                </button>
+                            </div>
+                        </form>
+                        <div id="searchSuggestions"></div>
+                    </div>
                 </div>
             </div>
 
-            <!-- Right side: User Actions -->
-            <div class="d-flex ms-auto align-items-center">
+            <!-- Right section -->
+            <div class="navbar-right d-flex ms-auto align-items-center">
                 {% if user.is_authenticated %}
-                    <!-- Profile Picture and Welcome Message -->
                     <div class="d-flex align-items-center me-3">
                         {% if user.profile.profile_picture %}
                             <img src="{{ user.profile.profile_picture.url }}" 
@@ -287,18 +613,135 @@
                         {% endif %}
                         <span class="navbar-text text-white">Welcome, {{ user.username }}!</span>
                     </div>
-                    <!-- Profile Button -->
                     <a href="{% url 'profile' %}" class="btn btn-outline-light me-1">Profile</a>
-                    <!-- Logout Button -->
                     <a href="{% url 'logout' %}" class="btn btn-outline-danger">Logout</a>
                 {% else %}
-                    <!-- Login and Register Buttons -->
                     <a href="{% url 'login' %}" class="btn btn-outline-light button-spacing">Login</a>
                     <a href="{% url 'register' %}" class="btn btn-outline-light ms-2">Register</a>
                 {% endif %}
             </div>
         </div>
     </nav>
+
+    <!-- Add this right after the navbar -->
+    <div id="advancedSearchPanel" class="advanced-search-panel">
+        <form method="GET" action="{% url 'posts:post_list' %}" class="advanced-search-form">
+            <input type="hidden" name="advanced_search" value="true">
+            
+            <div class="row">
+                <!-- Column 1: Categorized Information (unchanged) -->
+                <div class="col-md-6">
+                    <h5>Categorized Information</h5>
+                    <!-- Tags input group -->
+                    <div class="mb-3 d-flex align-items-center">
+                        <div style="width: 90%;" class="categorized-input-container">
+                            <div class="d-flex gap-2">
+                                <input type="text" name="tags" class="form-control" placeholder="Tags">
+                                <button type="button" class="btn btn-outline-danger btn-sm" onclick="resetTags()">Reset</button>
+                            </div>
+                            <div class="selected-items" id="selectedTags"></div>
+                        </div>
+                    </div>
+                    <!-- Colors input group -->
+                    <div class="mb-3 d-flex align-items-center">
+                        <div style="width: 90%;" class="categorized-input-container">
+                            <div class="d-flex gap-2">
+                                <input type="text" name="colors" class="form-control" placeholder="Colors">
+                                <button type="button" class="btn btn-outline-danger btn-sm" onclick="resetColors()">Reset</button>
+                            </div>
+                            <div class="selected-items" id="selectedColors"></div>
+                        </div>
+                    </div>
+                    <!-- Shapes input group -->
+                    <div class="mb-3 d-flex align-items-center">
+                        <div style="width: 90%;" class="categorized-input-container">
+                            <div class="d-flex gap-2">
+                                <input type="text" name="shapes" class="form-control" placeholder="Shapes">
+                                <button type="button" class="btn btn-outline-danger btn-sm" onclick="resetShapes()">Reset</button>
+                            </div>
+                            <div class="selected-items" id="selectedShapes"></div>
+                        </div>
+                    </div>
+                    <!-- Materials input group -->
+                    <div class="mb-3 d-flex align-items-center">
+                        <div style="width: 90%;" class="categorized-input-container">
+                            <div class="d-flex gap-2">
+                                <input type="text" name="materials" class="form-control" placeholder="Materials">
+                                <button type="button" class="btn btn-outline-danger btn-sm" onclick="resetMaterials()">Reset</button>
+                            </div>
+                            <div class="selected-items" id="selectedMaterials"></div>
+                        </div>
+                    </div>
+                    <!-- Textures input group -->
+                    <div class="mb-3 d-flex align-items-center">
+                        <div style="width: 90%;" class="categorized-input-container">
+                            <div class="d-flex gap-2">
+                                <input type="text" name="textures" class="form-control" placeholder="Textures">
+                                <button type="button" class="btn btn-outline-danger btn-sm" onclick="resetTextures()">Reset</button>
+                            </div>
+                            <div class="selected-items" id="selectedTextures"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Column 2: Quantifiable Properties -->
+                <div class="col-md-6">
+                    <h5>Quantifiable Properties</h5>
+                    <div class="row mb-3">
+                        <div class="col-12">
+                            <div class="d-flex gap-2">
+                                <input type="text" name="min_length" class="form-control measurement-input" placeholder="Min Length [cm]">
+                                <input type="text" name="max_length" class="form-control measurement-input" placeholder="Max Length [cm]">
+                                <button type="button" class="btn btn-outline-danger btn-sm" onclick="resetMeasurement('length')">Reset</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-12">
+                            <div class="d-flex gap-2">
+                                <input type="text" name="min_width" class="form-control measurement-input" placeholder="Min Width [cm]">
+                                <input type="text" name="max_width" class="form-control measurement-input" placeholder="Max Width [cm]">
+                                <button type="button" class="btn btn-outline-danger btn-sm" onclick="resetMeasurement('width')">Reset</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-12">
+                            <div class="d-flex gap-2">
+                                <input type="text" name="min_height" class="form-control measurement-input" placeholder="Min Height [cm]">
+                                <input type="text" name="max_height" class="form-control measurement-input" placeholder="Max Height [cm]">
+                                <button type="button" class="btn btn-outline-danger btn-sm" onclick="resetMeasurement('height')">Reset</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-12">
+                            <div class="d-flex gap-2">
+                                <input type="text" name="min_weight" class="form-control measurement-input" placeholder="Min Weight [g]">
+                                <input type="text" name="max_weight" class="form-control measurement-input" placeholder="Max Weight [g]">
+                                <button type="button" class="btn btn-outline-danger btn-sm" onclick="resetMeasurement('weight')">Reset</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-12">
+                            <div class="d-flex gap-2">
+                                <input type="text" name="min_price" class="form-control measurement-input" placeholder="Min Price [$]">
+                                <input type="text" name="max_price" class="form-control measurement-input" placeholder="Max Price [$]">
+                                <button type="button" class="btn btn-outline-danger btn-sm" onclick="resetMeasurement('price')">Reset</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="text-center mt-3">
+                <button type="submit" class="btn btn-outline-light" style="min-width: 140px !important; padding-left: 15px !important; padding-right: 15px !important; white-space: nowrap !important;">Apply Filters</button>
+                <button type="button" class="btn btn-outline-light ms-2" id="clearAdvancedSearch" style="min-width: 140px !important; padding-left: 15px !important; padding-right: 15px !important; white-space: nowrap !important;">Clear Filters</button>
+                <button type="button" class="btn btn-outline-light ms-2" id="closeAdvancedSearch" style="min-width: 140px !important; padding-left: 15px !important; padding-right: 15px !important; white-space: nowrap !important;">Close</button>
+            </div>
+        </form>
+    </div>
 
     <!-- Flash Messages -->
     {% if messages %}
@@ -400,7 +843,308 @@
                 e.preventDefault();
             }
         });
+
+        const advancedSearchBtn = document.getElementById('advancedSearchBtn');
+        const advancedSearchPanel = document.getElementById('advancedSearchPanel');
+        const closeAdvancedSearch = document.getElementById('closeAdvancedSearch');
+
+        advancedSearchBtn.addEventListener('click', function() {
+            advancedSearchPanel.style.display = 'block';
+            setTimeout(() => {
+                advancedSearchPanel.classList.add('show');
+            }, 10);
+        });
+
+        closeAdvancedSearch.addEventListener('click', function() {
+            advancedSearchPanel.classList.remove('show');
+            setTimeout(() => {
+                advancedSearchPanel.style.display = 'none';
+            }, 300);
+        });
     });
+
+    // Add this function to check input status
+    function checkInputStatus(fieldName) {
+        const input = document.querySelector(`input[name="${fieldName}"]`);
+        const container = document.getElementById(`selected${fieldName.charAt(0).toUpperCase() + fieldName.slice(1)}`);
+        const existingButtons = container.getElementsByClassName('filter-button');
+        
+        // Check for "Not Specified!" or max filters
+        if (Array.from(existingButtons).some(button => button.textContent.includes("Not Specified!"))) {
+            input.disabled = true;
+            input.placeholder = "Not Specified! selected";
+            return false;
+        }
+        
+        if (existingButtons.length >= 5) {
+            input.disabled = true;
+            input.placeholder = "Maximum filters reached (5)";
+            return false;
+        }
+        
+        input.disabled = false;
+        input.placeholder = fieldName.charAt(0).toUpperCase() + fieldName.slice(1);
+        return true;
+    }
+
+    // Update the setupFieldSuggestions function
+    function setupFieldSuggestions(fieldName) {
+        const input = document.querySelector(`input[name="${fieldName}"]`);
+        const container = input.closest('.categorized-input-container');
+        const selectedContainer = document.getElementById(`selected${fieldName.charAt(0).toUpperCase() + fieldName.slice(1)}`);
+        
+        // Initial check of input status
+        checkInputStatus(fieldName);
+        
+        // Create suggestions container if it doesn't exist
+        let suggestionsDiv = container.querySelector('.field-suggestions');
+        if (!suggestionsDiv) {
+            suggestionsDiv = document.createElement('div');
+            suggestionsDiv.className = 'field-suggestions';
+            container.appendChild(suggestionsDiv);
+        }
+
+        let timeoutId;
+
+        input.addEventListener('input', function() {
+            // Check if input should be allowed
+            if (!checkInputStatus(fieldName)) {
+                return;
+            }
+
+            clearTimeout(timeoutId);
+            const query = this.value.trim();
+
+            if (query.length < 1) {
+                suggestionsDiv.style.display = 'none';
+                return;
+            }
+
+            timeoutId = setTimeout(() => {
+                fetch(`{% url 'posts:field_suggestions' %}?field=${fieldName}&q=${encodeURIComponent(query)}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        suggestionsDiv.innerHTML = '';
+                        let suggestions = data.suggestions;
+                        
+                        // Filter out "Not Specified!" if filters exist
+                        const existingButtons = selectedContainer.getElementsByClassName('filter-button');
+                        if (existingButtons.length > 0) {
+                            suggestions = suggestions.filter(s => s !== "Not Specified!");
+                        }
+
+                        if (suggestions.length > 0) {
+                            suggestions.forEach(suggestion => {
+                                const div = document.createElement('div');
+                                div.className = 'suggestion-item';
+                                div.textContent = suggestion;
+                                div.addEventListener('click', () => {
+                                    addFilter(fieldName, suggestion);
+                                    input.value = '';
+                                    suggestionsDiv.style.display = 'none';
+                                });
+                                suggestionsDiv.appendChild(div);
+                            });
+                            suggestionsDiv.style.display = 'block';
+                        } else {
+                            suggestionsDiv.style.display = 'none';
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error fetching suggestions:', error);
+                        suggestionsDiv.style.display = 'none';
+                    });
+            }, 300);
+        });
+
+        // Close suggestions when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!input.contains(e.target) && !suggestionsDiv.contains(e.target)) {
+                suggestionsDiv.style.display = 'none';
+            }
+        });
+    }
+
+    // Update the addFilter function
+    function addFilter(fieldName, value) {
+        const container = document.getElementById(`selected${fieldName.charAt(0).toUpperCase() + fieldName.slice(1)}`);
+        const existingButtons = container.getElementsByClassName('filter-button');
+        
+        // Check for "Not Specified!" exclusivity
+        if (value === "Not Specified!" && existingButtons.length > 0) {
+            return;
+        }
+        if (existingButtons.length > 0 && Array.from(existingButtons)
+            .some(button => button.textContent.includes("Not Specified!"))) {
+            return;
+        }
+        
+        // Check for duplicates
+        if (Array.from(existingButtons)
+            .some(button => button.textContent.replace('×', '').trim() === value)) {
+            return;
+        }
+        
+        // Check maximum limit
+        if (existingButtons.length >= 5) {
+            return;
+        }
+        
+        createFilterButton(value, container, fieldName);
+        updateHiddenInput(fieldName);
+        checkInputStatus(fieldName);
+    }
+
+    // Update the removeFilter function
+    function removeFilter(element, fieldName) {
+        const button = element.parentElement;
+        const container = button.parentElement;
+        
+        button.remove();
+        updateHiddenInput(fieldName);
+        checkInputStatus(fieldName);
+    }
+
+    // Update the resetFilters function
+    function resetFilters(fieldName) {
+        const container = document.getElementById(`selected${fieldName.charAt(0).toUpperCase() + fieldName.slice(1)}`);
+        
+        // Clear all filters
+        container.innerHTML = '';
+        updateHiddenInput(fieldName);
+        checkInputStatus(fieldName);
+    }
+
+    // Initialize when the document is ready
+    document.addEventListener('DOMContentLoaded', function() {
+        const fields = ['tags', 'colors', 'shapes', 'materials', 'textures'];
+        fields.forEach(field => setupFieldSuggestions(field));
+    });
+
+    // Add these utility functions
+    function createFilterButton(value, container, fieldName) {
+        const button = document.createElement('span');
+        button.className = 'filter-button';
+        button.innerHTML = `
+            ${value}
+            <span class="remove-filter" onclick="removeFilter(this, '${fieldName}')">&times;</span>
+        `;
+        container.appendChild(button);
+    }
+
+    function updateHiddenInput(fieldName) {
+        const container = document.getElementById(`selected${fieldName.charAt(0).toUpperCase() + fieldName.slice(1)}`);
+        const buttons = container.getElementsByClassName('filter-button');
+        const values = Array.from(buttons).map(button => button.textContent.trim().replace('×', '').trim());
+        
+        // Update the hidden input
+        const hiddenInput = document.createElement('input');
+        hiddenInput.type = 'hidden';
+        hiddenInput.name = `${fieldName}_filters`;
+        hiddenInput.value = values.join(',');
+        
+        // Remove existing hidden input if any
+        const existingHidden = container.querySelector(`input[name="${fieldName}_filters"]`);
+        if (existingHidden) {
+            existingHidden.remove();
+        }
+        
+        container.appendChild(hiddenInput);
+    }
+
+    // Add these functions to handle reset functionality
+    function resetTags() { resetFilters('tags'); }
+    function resetColors() { resetFilters('colors'); }
+    function resetShapes() { resetFilters('shapes'); }
+    function resetMaterials() { resetFilters('materials'); }
+    function resetTextures() { resetFilters('textures'); }
+
+    // Add this function to handle measurement inputs
+    function setupMeasurementInputs() {
+        const measurementInputs = document.querySelectorAll('.measurement-input');
+        
+        measurementInputs.forEach(input => {
+            // Remove up/down arrows
+            input.addEventListener('wheel', function(e) {
+                e.preventDefault();
+            });
+
+            input.addEventListener('keydown', function(e) {
+                // Allow: backspace, delete, tab, escape, enter, and decimal point
+                if ([46, 8, 9, 27, 13, 190].indexOf(e.keyCode) !== -1 ||
+                    // Allow: Ctrl+A, Ctrl+C, Ctrl+V, Ctrl+X
+                    (e.keyCode === 65 && e.ctrlKey === true) ||
+                    (e.keyCode === 67 && e.ctrlKey === true) ||
+                    (e.keyCode === 86 && e.ctrlKey === true) ||
+                    (e.keyCode === 88 && e.ctrlKey === true) ||
+                    // Allow: home, end, left, right
+                    (e.keyCode >= 35 && e.keyCode <= 39)) {
+                    return;
+                }
+                // Block any non-number
+                if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && 
+                    (e.keyCode < 96 || e.keyCode > 105)) {
+                    e.preventDefault();
+                }
+            });
+
+            input.addEventListener('input', function(e) {
+                let value = this.value;
+                
+                // Handle starting with dot
+                if (value.startsWith('.')) {
+                    value = '0' + value;
+                }
+                
+                // Remove any non-numeric characters except dot
+                value = value.replace(/[^\d.]/g, '');
+                
+                // Ensure only one decimal point
+                const parts = value.split('.');
+                if (parts.length > 2) {
+                    value = parts[0] + '.' + parts.slice(1).join('');
+                }
+                
+                // Remove negative numbers
+                value = value.replace('-', '');
+                
+                this.value = value;
+            });
+
+            // Format on blur
+            input.addEventListener('blur', function() {
+                if (this.value && !isNaN(this.value)) {
+                    const num = parseFloat(this.value);
+                    if (num < 0) {
+                        this.value = '0';
+                    }
+                }
+            });
+        });
+    }
+
+    // Add this to your DOMContentLoaded event listener
+    document.addEventListener('DOMContentLoaded', function() {
+        // ... existing code ...
+        setupMeasurementInputs();
+    });
+
+    // Add the clear filters functionality
+    document.getElementById('clearAdvancedSearch').addEventListener('click', function() {
+        // Clear all categorized information filters
+        const fields = ['tags', 'colors', 'shapes', 'materials', 'textures'];
+        fields.forEach(field => resetFilters(field));
+
+        // Clear all measurement inputs
+        const measurementInputs = document.querySelectorAll('.measurement-input');
+        measurementInputs.forEach(input => input.value = '');
+    });
+
+    // Add this function to handle measurement reset
+    function resetMeasurement(type) {
+        document.querySelector(`input[name="min_${type}"]`).value = '';
+        document.querySelector(`input[name="max_${type}"]`).value = '';
+    }
     </script>
 </body>
 </html>
