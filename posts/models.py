@@ -17,7 +17,18 @@ class Tag(models.Model):
 
 
 class Post(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="posts")
+    user = models.ForeignKey(
+        User, 
+        on_delete=models.SET_NULL,
+        related_name="posts",
+        null=True,
+        blank=True
+    )
+    deleted_username = models.CharField(
+        max_length=150, 
+        default="",
+        blank=True
+    )
     title = models.CharField(max_length=255, null=False, blank=False)  # Required
     image = models.ImageField(upload_to='uploads/', null=False, blank=False)  # Required
     content = models.TextField(null=False, blank=False)  # Required
@@ -44,9 +55,13 @@ class Post(models.Model):
 
     created_at = models.DateTimeField(auto_now_add=True)
 
+    def get_username(self):
+        if self.user:
+            return self.user.username
+        return self.deleted_username or "Deleted User"
+
     def __str__(self):
-        user_display = self.user.username if self.user else "Anonymous"
-        return f"{self.title or 'No Title'} - {user_display}"
+        return f"{self.title or 'No Title'} - {self.get_username()}"
 
     def get_shapes_list(self):
         """Utility method to return shapes as a list."""
@@ -98,11 +113,26 @@ class Post(models.Model):
 
 class Comment(models.Model):
     post = models.ForeignKey(Post, related_name='comments', on_delete=models.CASCADE)
-    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    user = models.ForeignKey(
+        User, 
+        on_delete=models.SET_NULL,
+        related_name='comments',
+        null=True,
+        blank=True
+    )
+    deleted_username = models.CharField(
+        max_length=150, 
+        default="",
+        blank=True
+    )
     content = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
 
+    def get_username(self):
+        if self.user:
+            return self.user.username
+        return self.deleted_username or "Deleted User"
+
     def __str__(self):
-        user_display = self.user.username if self.user else "Anonymous"
-        return f"Comment by {user_display} on {self.post}"
+        return f"Comment by {self.get_username()} on {self.post}"
 

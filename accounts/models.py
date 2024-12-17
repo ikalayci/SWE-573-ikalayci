@@ -20,3 +20,18 @@ def create_user_profile(sender, instance, created, **kwargs):
 @receiver(post_save, sender=User)
 def save_user_profile(sender, instance, **kwargs):
     instance.profile.save()
+
+class DeletedUser(models.Model):
+    original_id = models.IntegerField(unique=True)
+    username = models.CharField(max_length=150)
+    deletion_date = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Deleted: {self.username}"
+
+    @classmethod
+    def create_from_user(cls, user):
+        return cls.objects.create(
+            original_id=user.id,
+            username=user.username
+        )

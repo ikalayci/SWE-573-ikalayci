@@ -6,6 +6,7 @@ from .models import Post, Comment, Tag
 from .forms import PostCreationForm
 from django.db.models import Q
 from django.http import JsonResponse
+from django.views.decorators.http import require_POST
 
 
 
@@ -354,4 +355,48 @@ def get_field_suggestions(request):
                 suggestions.insert(0, "Not Specified!")
     
     return JsonResponse({'suggestions': suggestions})
+
+
+@require_POST
+@login_required
+def update_post_status(request, post_id):
+    print(f"Received status update request for post {post_id}")  # Debug print
+    print(f"Request user: {request.user}, Is superuser: {request.user.is_superuser}")  # Debug print
+    
+    try:
+        post = Post.objects.get(id=post_id)
+        print(f"Post owner: {post.user}")  # Debug print
+        
+        # Allow both post owner and admin to update status
+        if not (request.user == post.user or request.user.is_superuser):
+            print("Unauthorized: User is neither owner nor admin")  # Debug print
+            return JsonResponse({
+                'success': False, 
+                'error': 'Unauthorized'
+            }, status=403)
+
+        data = json.loads(request.body)
+        new_status = data.get('status')
+        print(f"New status: {new_status}")  # Debug print
+        
+        post.status = new_status
+        post.save()
+        
+        return JsonResponse({
+            'success': True,
+            'message': f'Status updated to {new_status}'
+        })
+        
+    except Post.DoesNotExist:
+        print(f"Post {post_id} not found")  # Debug print
+        return JsonResponse({
+            'success': False, 
+            'error': 'Post not found'
+        }, status=404)
+    except Exception as e:
+        print(f"Error updating status: {str(e)}")  # Debug print
+        return JsonResponse({
+            'success': False, 
+            'error': str(e)
+        }, status=500)
 

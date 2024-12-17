@@ -7,7 +7,9 @@ app_name = 'posts'
 urlpatterns = [
     # API endpoints
     path('api/search-suggestions/', api.search_suggestions, name='search_suggestions'),
-    path('api/update-status/<int:post_id>/', api.update_post_status, name='update_status'),
+    path('api/update-status/<int:post_id>/', views.update_post_status, name='update_post_status'),
+    path('api/delete-post/<int:post_id>/', api.delete_post, name='delete_post'),
+    path('api/delete-all-posts/', api.delete_all_posts, name='delete_all_posts'),
     
     # Regular views
     path('', views.post_list, name='post_list'),

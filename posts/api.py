@@ -3,7 +3,8 @@ from django.http import JsonResponse
 from django.views.decorators.http import require_GET
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
+from django.shortcuts import get_object_or_404
 import json
 from .models import Post, Tag
 
@@ -219,3 +220,67 @@ def update_post_status(request, post_id):
         return JsonResponse({'success': True})
     except Post.DoesNotExist:
         return JsonResponse({'success': False, 'error': 'Post not found'}, status=404)
+
+def is_admin(user):
+    return user.is_authenticated and user.is_superuser
+
+@user_passes_test(is_admin)
+@csrf_exempt
+def delete_post(request, post_id):
+    if request.method != 'DELETE':
+        return JsonResponse({
+            'success': False,
+            'error': 'Method not allowed'
+        }, status=405)
+        
+    try:
+        post = get_object_or_404(Post, id=post_id)
+        
+        # Delete the post's image file if it exists
+        if post.image:
+            post.image.delete()
+            
+        # Delete the post
+        post.delete()
+        
+        return JsonResponse({
+            'success': True,
+            'message': 'Post deleted successfully'
+        })
+        
+    except Post.DoesNotExist:
+        return JsonResponse({
+            'success': False,
+            'error': 'Post not found'
+        }, status=404)
+    except Exception as e:
+        print(f"Error deleting post: {str(e)}")  # For debugging
+        return JsonResponse({
+            'success': False,
+            'error': f'Error deleting post: {str(e)}'
+        }, status=500)
+
+@user_passes_test(is_admin)
+@csrf_exempt
+def delete_all_posts(request):
+    if request.method != 'DELETE':
+        return JsonResponse({
+            'success': False,
+            'error': 'Method not allowed'
+        }, status=405)
+        
+    try:
+        # Delete all posts
+        Post.objects.all().delete()
+        
+        return JsonResponse({
+            'success': True,
+            'message': 'All posts deleted successfully'
+        })
+        
+    except Exception as e:
+        print(f"Error deleting all posts: {str(e)}")  # For debugging
+        return JsonResponse({
+            'success': False,
+            'error': f'Error deleting posts: {str(e)}'
+        }, status=500)

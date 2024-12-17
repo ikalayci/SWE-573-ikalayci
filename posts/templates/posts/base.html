@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SnapTrace.com</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <style>
         .navbar {
             position: fixed;
@@ -564,10 +565,13 @@
         <div class="container-fluid">
             <!-- Left section -->
             <div class="navbar-left d-flex align-items-center">
-                <a href="{% url 'posts:post_list' %}" class="btn btn-outline-light me-2">Home</a>
-                <span class="navbar-brand mb-0 h1 home-text-gap">SnapTrace.com</span>
+                <span class="navbar-brand mb-0 h1" style="font-size: 20px; margin-right: 20px;">SnapTrace.com</span>
+                <a href="{% url 'posts:post_list' %}" class="btn btn-outline-light me-2" style="height: 38px; padding: 6px 12px; font-size: 14px;">Home</a>
                 {% if user.is_authenticated %}
-                    <a href="{% url 'posts:create_post' %}" class="btn btn-outline-light ms-3">Add Post</a>
+                    <a href="{% url 'posts:create_post' %}" class="btn btn-outline-light me-2" style="height: 38px; padding: 6px 12px; font-size: 14px;">Add Post</a>
+                    {% if user.is_superuser %}
+                        <a href="{% url 'admin_screen' %}" class="btn btn-outline-warning" style="height: 38px; padding: 6px 12px; font-size: 14px;">Admin Screen</a>
+                    {% endif %}
                 {% endif %}
             </div>
 
@@ -583,10 +587,11 @@
                                 aria-label="Search"
                                 name="q"
                                 id="searchInput"
-                                autocomplete="off">
+                                autocomplete="off"
+                                style="height: 38px; font-size: 14px;">
                             <div class="search-button-group">
-                                <button class="btn btn-outline-light" type="submit">Search</button>
-                                <button type="button" class="btn btn-outline-light" id="advancedSearchBtn">
+                                <button class="btn btn-outline-light" type="submit" style="height: 38px; padding: 6px 12px; font-size: 14px;">Search</button>
+                                <button type="button" class="btn btn-outline-light" id="advancedSearchBtn" style="height: 38px; padding: 6px 12px; font-size: 14px;">
                                     Advanced Search
                                 </button>
                             </div>
@@ -611,13 +616,13 @@
                                  class="rounded-circle me-2"
                                  style="width: 38px; height: 38px; object-fit: cover;">
                         {% endif %}
-                        <span class="navbar-text text-white">Welcome, {{ user.username }}!</span>
+                        <span class="navbar-text text-white" style="font-size: 14px;">Welcome, {{ user.username }}!</span>
                     </div>
-                    <a href="{% url 'profile' %}" class="btn btn-outline-light me-1">Profile</a>
-                    <a href="{% url 'logout' %}" class="btn btn-outline-danger">Logout</a>
+                    <a href="{% url 'profile' %}" class="btn btn-outline-light me-2" style="height: 38px; padding: 6px 12px; font-size: 14px;">Profile</a>
+                    <a href="{% url 'logout' %}" class="btn btn-outline-danger" style="height: 38px; padding: 6px 12px; font-size: 14px;">Logout</a>
                 {% else %}
-                    <a href="{% url 'login' %}" class="btn btn-outline-light button-spacing">Login</a>
-                    <a href="{% url 'register' %}" class="btn btn-outline-light ms-2">Register</a>
+                    <a href="{% url 'login' %}" class="btn btn-outline-light me-2" style="height: 38px; padding: 6px 12px; font-size: 14px;">Login</a>
+                    <a href="{% url 'register' %}" class="btn btn-outline-light" style="height: 38px; padding: 6px 12px; font-size: 14px;">Register</a>
                 {% endif %}
             </div>
         </div>
@@ -860,6 +865,26 @@
             setTimeout(() => {
                 advancedSearchPanel.style.display = 'none';
             }, 300);
+        });
+
+        // Add click event listener to the document
+        document.addEventListener('click', function(event) {
+            const advancedSearchPanel = document.getElementById('advancedSearchPanel');
+            const advancedSearchBtn = document.getElementById('advancedSearchBtn');
+            
+            // Check if the panel is visible and the click is outside both the panel and the button
+            if (advancedSearchPanel && advancedSearchBtn) {
+                const isClickInsidePanel = advancedSearchPanel.contains(event.target);
+                const isClickOnButton = advancedSearchBtn.contains(event.target);
+                
+                if (!isClickInsidePanel && !isClickOnButton && advancedSearchPanel.classList.contains('show')) {
+                    // Close the panel
+                    advancedSearchPanel.classList.remove('show');
+                    setTimeout(() => {
+                        advancedSearchPanel.style.display = 'none';
+                    }, 300);
+                }
+            }
         });
     });
 

@@ -6,6 +6,27 @@
 <form method="post" action="{% url 'register' %}" class="mx-auto" style="max-width: 400px;">
     {% csrf_token %}
 
+    <!-- Role Switch -->
+    <div class="mb-3 d-flex align-items-center justify-content-between">
+        <label class="form-check-label">User</label>
+        <div class="form-check form-switch">
+            <input class="form-check-input" type="checkbox" role="switch" 
+                   id="roleSwitch" name="role" value="admin"
+                   style="width: 3em; height: 1.5em;">
+        </div>
+        <label class="form-check-label">Admin</label>
+    </div>
+
+    <!-- Admin Key Fields -->
+    <div id="adminKeyFields" class="admin-fields" style="display: none;">
+        <div class="mb-3">
+            <input type="password" name="admin_key" class="form-control" placeholder="Admin Key">
+        </div>
+        <div class="mb-3">
+            <input type="password" name="admin_key_confirm" class="form-control" placeholder="Confirm Admin Key">
+        </div>
+    </div>
+
     <!-- Username Field -->
     <div class="form-group">
         <label for="username">Username:</label>
@@ -36,4 +57,55 @@
         <a href="{% url 'posts:post_list' %}" class="btn text-white" style="background-color: #dc3545;">Cancel</a>
     </div>
 </form>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const roleSwitch = document.getElementById('roleSwitch');
+    const adminKeyFields = document.getElementById('adminKeyFields');
+
+    roleSwitch.addEventListener('change', function() {
+        adminKeyFields.style.display = this.checked ? 'block' : 'none';
+        
+        // Clear admin key fields when switching back to user
+        if (!this.checked) {
+            document.querySelector('input[name="admin_key"]').value = '';
+            document.querySelector('input[name="admin_key_confirm"]').value = '';
+        }
+    });
+});
+</script>
+
+<style>
+.form-switch {
+    padding-left: 2.5em;
+}
+
+.form-check-input {
+    cursor: pointer;
+}
+
+.form-check-input:checked {
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+}
+
+.admin-fields {
+    transition: all 0.3s ease;
+    overflow: hidden;
+    max-height: 0;
+    opacity: 0;
+}
+
+.admin-fields[style="display: block;"] {
+    max-height: 200px;
+    opacity: 1;
+    margin-top: 1rem;
+}
+
+/* Labels for the switch */
+.form-check-label {
+    color: #495057;
+    font-weight: 500;
+}
+</style>
 {% endblock %}
