@@ -16,20 +16,14 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from django.contrib.auth.views import LogoutView  # Import LogoutView
-from django.views.generic.base import RedirectView  # Import RedirectView
-from accounts import views as account_views
 from django.conf import settings
 from django.conf.urls.static import static
+from django.views.generic import RedirectView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('', RedirectView.as_view(pattern_name='posts:post_list'), name='home'),
+    path('posts/', include('posts.urls')),
     path('accounts/', include('accounts.urls')),
-    path('posts/', include('posts.urls')),  # Include posts app URLs
-    path('logout/', LogoutView.as_view(next_page='/posts/'), name='logout'),
-    path('', RedirectView.as_view(pattern_name='post_list', permanent=False)),  # Redirect home to post_list
-]
-
-if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
     

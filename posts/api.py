@@ -2,6 +2,9 @@ from django.db.models import Q
 from django.http import JsonResponse
 from django.views.decorators.http import require_GET
 from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_POST
+from django.contrib.auth.decorators import login_required
+import json
 from .models import Post, Tag
 
 @csrf_exempt
@@ -201,3 +204,18 @@ def search_suggestions(request):
     
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=400)
+
+@require_POST
+@login_required
+def update_post_status(request, post_id):
+    try:
+        post = Post.objects.get(id=post_id)
+        if request.user != post.user:
+            return JsonResponse({'success': False, 'error': 'Unauthorized'}, status=403)
+
+        data = json.loads(request.body)
+        post.status = data.get('status')
+        post.save()
+        return JsonResponse({'success': True})
+    except Post.DoesNotExist:
+        return JsonResponse({'success': False, 'error': 'Post not found'}, status=404)

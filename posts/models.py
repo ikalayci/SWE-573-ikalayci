@@ -36,8 +36,11 @@ class Post(models.Model):
     materials = models.TextField(null=True, blank=True)  # Store as a string
     textures = models.TextField(blank=True, null=True)  # Stores textures as a comma-separated string
 
-
-
+    status = models.CharField(
+        max_length=10,
+        choices=[('unsolved', 'Unsolved'), ('solved', 'Solved')],
+        default='unsolved'
+    )
 
     created_at = models.DateTimeField(auto_now_add=True)
 

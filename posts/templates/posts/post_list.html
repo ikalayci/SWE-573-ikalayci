@@ -11,7 +11,14 @@
             <div class="card">
                 <!-- Status button -->
                 <div class="status-button">
-                    <button class="btn btn-outline-danger btn-sm">Unsolved</button>
+                    <button class="btn btn-sm 
+                            {% if post.status == 'solved' %}
+                                btn-outline-success
+                            {% else %}
+                                btn-outline-danger
+                            {% endif %}">
+                        {{ post.status|title }}
+                    </button>
                 </div>
                 
                 <!-- Card Header Section -->
