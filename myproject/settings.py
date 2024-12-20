@@ -133,8 +133,8 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # settings.py 
 # this code directs me to home page when I make login or logout
-LOGIN_REDIRECT_URL = 'home'  # Change 'home' to your preferred redirect page
-LOGOUT_REDIRECT_URL = 'home'
+LOGIN_REDIRECT_URL = 'posts:post_list'  # Update this
+LOGOUT_REDIRECT_URL = 'posts:post_list'  # Update this
 
 # settings.py 
 # this code is to create and direct to media files for pictures

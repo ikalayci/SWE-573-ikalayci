@@ -111,82 +111,29 @@ def home(request):
 @csrf_exempt
 def profile_view(request, username=None):
     if username:
-        profile_user = get_object_or_404(User, username=username)
+        user = get_object_or_404(User, username=username)
     else:
-        if not request.user.is_authenticated:
-            return redirect('login')
-        profile_user = request.user
+        user = request.user
     
-    profile = profile_user.profile
+    profile = user.profile
+    # Force update ranks before displaying
+    profile.update_ranks()
     
-    if request.method == 'POST':
-        if not request.user.is_authenticated or request.user.id != profile_user.id:
-            return JsonResponse({'error': 'Unauthorized'}, status=401)
-            
-        try:
-            # Handle JSON data for text fields
-            if request.content_type == "application/json":
-                data = json.loads(request.body)
-                updated_fields = {}
-
-                # Update username
-                if 'username' in data:
-                    username = data['username']
-                    if username != request.user.username and User.objects.filter(username=username).exists():
-                        return JsonResponse({'error': 'Username already exists'}, status=400)
-                    request.user.username = username
-                    updated_fields['username'] = username
-
-                # Update email
-                if 'email' in data:
-                    email = data['email']
-                    if email != request.user.email and User.objects.filter(email=email).exists():
-                        return JsonResponse({'error': 'Email already exists'}, status=400)
-                    request.user.email = email
-                    updated_fields['email'] = email
-
-                # Update profession
-                if 'profession' in data:
-                    profile.profession = data['profession'] or "Unknown"
-                    updated_fields['profession'] = profile.profession
-
-                # Update bio
-                if 'bio' in data:
-                    profile.bio = data['bio'] or "Unknown"
-                    updated_fields['bio'] = profile.bio
-
-                # Update password
-                if 'current_password' in data and 'new_password' in data:
-                    if not request.user.check_password(data['current_password']):
-                        return JsonResponse({'error': 'Current password is incorrect'}, status=400)
-                    request.user.set_password(data['new_password'])
-                    updated_fields['password'] = 'updated'
-
-                request.user.save()
-                profile.save()
-                return JsonResponse(updated_fields)
-
-            # Handle image file upload
-            elif request.content_type.startswith("multipart/form-data"):
-                profile_picture = request.FILES.get('image')
-                if profile_picture:
-                    profile.profile_picture = profile_picture
-                    profile.save()
-                    return JsonResponse({'success': True, 'profile_picture_url': profile.profile_picture.url})
-                return JsonResponse({'error': 'No image uploaded'}, status=400)
-
-            return JsonResponse({'error': 'Invalid content type'}, status=400)
-
-        except Exception as e:
-            return JsonResponse({'error': str(e)}, status=400)
-
+    # Determine user type
+    if user.is_superuser or user.is_staff:
+        user_type = 'Admin'
+    else:
+        user_type = profile.user_type
+    
     context = {
-        'profile_user': profile_user,
         'profile': profile,
-        'debug': settings.DEBUG,
-        'is_own_profile': request.user.id == profile_user.id if request.user.is_authenticated else False
+        'viewed_user': user,
+        'username': user.username,
+        'email': user.email,
+        'profession': profile.profession,
+        'bio': profile.bio,
+        'user_type': user_type,  # Use the determined user type
     }
-    
     return render(request, 'accounts/profile.html', context)
 
 def user_profile(request, username):
@@ -305,6 +252,21 @@ def delete_user(request, user_id):
             'success': False,
             'error': f'Error deleting user: {str(e)}'
         }, status=500)
+
+def profile(request):
+    profile = request.user.profile
+    
+    # Determine user type
+    if request.user.is_superuser or request.user.is_staff:
+        user_type = 'Admin'
+    else:
+        user_type = profile.user_type
+        
+    context = {
+        'profile': profile,
+        'user_type': user_type,  # Add this to context
+    }
+    return render(request, 'accounts/profile.html', context)
 
 
 

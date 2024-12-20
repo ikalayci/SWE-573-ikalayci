@@ -1,0 +1,4 @@
+[Username] [Comment Type Badge] [Links]
+[Comment Content]
+[Timestamp]                                [Voting Controls] [Select as Winner]
+[User Ranks] 

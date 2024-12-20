@@ -2,32 +2,40 @@
 {% load static %}
 
 {% block content %}
-<h2 class="text-center mb-4 fw-bold" style="color: #34414b;">User Profile</h2>
+{% csrf_token %}
+
+<!DOCTYPE html>
+<html lang="en">
+<h2 class="text-center mb-4">User Profile</h2>
+
 
 <!-- Include Cropper.js -->
 <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
 
 <div id="profile-page">
-    <div class="card mx-auto" style="max-width: 800px; margin-bottom: 100px;">
+    <div class="card mx-auto" style="max-width: 800px;">
         <div class="card-body">
             <ul class="list-group">
+
                 <!-- Profile Picture Section -->
+                <!-- This section displays the user's profile picture and allows editing -->
                 <li class="list-group-item">
                     <strong>Profile Picture:</strong>
                     <div class="d-flex justify-content-center align-items-center">
-                        <div class="profile-picture-wrapper">
+                        <div class="profile-picture-wrapper" >
                             <img id="profile-picture" 
-                                src="{% if profile.profile_picture %}{{ profile.profile_picture.url }}{% else %}{% static 'images/default-profile-picture.png' %}{% endif %}"
+                                src="{% if user.profile.profile_picture %}{{ user.profile.profile_picture.url }}{% else %}{% static 'images/default-profile-picture.png' %}{% endif %}"
                                 alt="Profile Picture" 
                                 class="profile-picture">
                         </div>
                     </div>
-                    {% if is_own_profile %}
-                    <div class="update-button-wrapper">
-                        <button id="update-button" class="btn btn-primary btn-sm" onclick="enableProfilePictureEdit()">Update</button>
+                    <div class="update-button-wrapper" >
+                        <!-- Add the new Update button -->
+                        <button id= "update-button"  class="btn btn-secondary btn-sm picture-update-button" onclick="enableProfilePictureEdit()">Update</button>
                     </div>
-                    
+                
+                    <!-- Profile Picture Edit Controls (Initially Hidden) -->
                     <div id="profile-picture-edit" class="d-none mt-2 text-center">
                         <div class="profile-picture-frame mx-auto">
                             <img id="preview-picture" 
@@ -35,52 +43,114 @@
                                 alt="Profile Picture">
                         </div>
                         <div class="d-flex justify-content-center align-items-center gap-3 mt-3">
-                            <input type="file" id="file-input" accept="image/*" style="display: none;" onchange="loadAndDisplayImage(event)">
-                            <button id="upload-picture-button" class="btn btn-primary btn-sm" onclick="document.getElementById('file-input').click();">Upload Picture</button>
-                            <div id="additional-container" class="border p-2 d-flex align-items-center" style="min-width: 300px;">
+                            <!-- Hidden File Input -->
+                            <input 
+                                type="file" 
+                                id="file-input" 
+                                accept="image/*" 
+                                style="display: none;" 
+                                onchange="loadAndDisplayImage(event)">
+                            <!-- Upload Picture Button -->
+                            <button 
+                                id="upload-picture-button" 
+                                class="btn btn-secondary btn-sm" 
+                                onclick="document.getElementById('file-input').click();">
+                                Upload Picture
+                            </button>
+                            <!-- File Path Container -->
+                            <div 
+                                id="additional-container" 
+                                class="border p-2 d-flex align-items-center" 
+                                style="min-width: 300px;">
                                 <p id="file-path" class="text-muted mb-0 mx-auto">No Selection</p>
                             </div>
                         </div>
                         <button class="btn btn-success btn-sm mt-2" onclick="saveProfilePicture()">Save</button>
                         <button class="btn btn-danger btn-sm mt-2" onclick="cancelProfilePictureEdit()">Cancel</button>
-                    </div>
-                    {% endif %}
+                    </div>   
                 </li>
+
+                
+                <!-- Find this section in your file -->
+                <div class="d-flex gap-2 registration-ranks-container">
+                    <!-- Registration Type Section -->
+                    <li class="list-group-item flex-grow-1">
+                        <div>
+                            <div class="mb-2">
+                                <strong>Registration Type:</strong>
+                            </div>
+                            <div>
+                                <span class="badge" style="background-color: {% if profile.user.is_superuser or profile.user.is_staff %}#C00000{% else %}#00B0F0{% endif %}; color: white;">
+                                    {% if profile.user.is_superuser or profile.user.is_staff %}
+                                        Admin
+                                    {% else %}
+                                        Member
+                                    {% endif %}
+                                </span>
+                            </div>
+                        </div>
+                    </li>
+
+                    <!-- Ranks Section -->
+                    <li class="list-group-item flex-grow-1">
+                        <div>
+                            <div class="mb-2">
+                                <strong>Ranks:</strong>
+                            </div>
+                            <div>
+                                {% if profile.ranks %}
+                                    {% for rank in profile.ranks %}
+                                        <span class="badge" style="background-color: {% if rank == 'Mysterion' %}#006699{% elif rank == 'Hintarion' %}#33CCCC{% elif rank == 'Querysmith' %}#CC99FF{% elif rank == 'Luminarch' %}#00CC99{% elif rank == 'Cloutcaster' %}#0066FF{% elif rank == 'Riddlecaster' %}#CC0099{% elif rank == 'Trailblossom' %}#F69200{% elif rank == 'Trailwhisper' %}#FF5050{% else %}#33CCCC{% endif %}; color: {% if rank == 'Cloutcaster' %}black{% else %}white{% endif %};"
+                                              title="{% if rank == 'Trailblossom' %}A quiet contributor on the verge of blossoming into prominence.
+                                                     {% elif rank == 'Trailwhisper' %}A commenter whose subtle words leave a growing impact.
+                                                     {% elif rank == 'Mysterion' %}Inspired by 'mystery' and 'champion,' signifying a conqueror of the unknown.
+                                                     {% elif rank == 'Hintarion' %}A majestic figure in the art of giving hints.
+                                                     {% elif rank == 'Luminarch' %}A ruler in the realm of light and guidance, symbolizing mastery of hints
+                                                     {% elif rank == 'Querysmith' %}A skilled forger of insightful and thought-provoking questions.
+                                                     {% elif rank == 'Cloutcaster' %}A user whose comments cast influence far and wide.
+                                                     {% endif %}">
+                                            {{ rank }}
+                                        </span>
+                                    {% endfor %}
+                                {% else %}
+                                    <span>No ranks achieved yet</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </li>
+                </div>
 
                 <!-- Username Section -->
                 <li class="list-group-item">
                     <strong>Username:</strong>
                     <div id="username-section">
-                        <p id="username" class="text-wrap">{{ profile_user.username }}</p>
-                        {% if is_own_profile %}
-                        <input id="username-input" class="form-control form-control-sm d-none" value="{{ profile_user.username }}">
-                        <div id="username-buttons" class="text-end mt-2">
-                            <button class="btn btn-success btn-sm d-none" onclick="saveEdit('username')">Save</button>
-                            <button class="btn btn-danger btn-sm ms-2 d-none" onclick="cancelEdit('username', '{{ profile_user.username }}')">Cancel</button>
-                            <button class="btn btn-primary btn-sm" onclick="enableEdit('username')">Update</button>
-                        </div>
-                        {% endif %}
+                        <p id="username" class="text-wrap">{{ user.username }}</p>
+                        <input id="username-input" class="form-control form-control-sm d-none" value="{{ user.username }}">
+                    </div>
+                    <div id="username-buttons" class="text-end mt-2">
+                        <button class="btn btn-success btn-sm d-none" onclick="saveEdit('username')">Save</button>
+                        <button class="btn btn-danger btn-sm ms-2 d-none" onclick="cancelEdit('username', '{{ user.username }}')">Cancel</button>
+                        <button class="btn btn-secondary btn-sm" onclick="enableEdit('username')">Update</button>
                     </div>
                 </li>
 
                 <!-- Email Section -->
+                <!-- This section displays the user's email and provides an option to edit -->
                 <li class="list-group-item">
                     <strong>Email:</strong>
                     <div id="email-section">
-                        <p id="email" class="text-wrap">{{ profile_user.email }}</p>
-                        {% if is_own_profile %}
-                        <input id="email-input" class="form-control form-control-sm d-none" value="{{ profile_user.email }}">
-                        <div id="email-buttons" class="text-end mt-2">
-                            <button class="btn btn-success btn-sm d-none" onclick="saveEdit('email')">Save</button>
-                            <button class="btn btn-danger btn-sm ms-2 d-none" onclick="cancelEdit('email', '{{ profile_user.email }}')">Cancel</button>
-                            <button class="btn btn-primary btn-sm" onclick="enableEdit('email')">Update</button>
-                        </div>
-                        {% endif %}
+                        <p id="email" class="text-wrap">{{ user.email }}</p>
+                        <input id="email-input" class="form-control form-control-sm d-none" value="{{ user.email }}">
+                    </div>
+                    <div id="email-buttons" class="text-end mt-2">
+                        <button class="btn btn-success btn-sm d-none" onclick="saveEdit('email')">Save</button>
+                        <button class="btn btn-danger btn-sm ms-2 d-none" onclick="cancelEdit('email', '{{ user.email }}')">Cancel</button>
+                        <button class="btn btn-secondary btn-sm" onclick="enableEdit('email')">Update</button>
                     </div>
                 </li>
 
                 <!-- Password Section -->
-                {% if is_own_profile %}
+                <!-- This section allows the user to update their password -->
                 <li class="list-group-item">
                     <strong>Password:</strong>
                     <div id="password-section">
@@ -94,292 +164,52 @@
                     <div id="password-buttons" class="text-end mt-2">
                         <button class="btn btn-success btn-sm d-none" onclick="savePassword()">Save</button>
                         <button class="btn btn-danger btn-sm ms-2 d-none" onclick="cancelPasswordEdit()">Cancel</button>
-                        <button class="btn btn-primary btn-sm" onclick="enablePasswordEdit()">Update</button>
+                        <button class="btn btn-secondary btn-sm" onclick="enablePasswordEdit()">Update</button>
                     </div>
                 </li>
-                {% endif %}
 
                 <!-- Profession Section -->
+                <!-- This section displays and allows editing of the user's profession -->
                 <li class="list-group-item">
                     <strong>Profession:</strong>
                     <div id="profession-section">
                         <p id="profession" class="text-wrap">{{ profile.profession|linebreaksbr }}</p>
-                        {% if is_own_profile %}
                         <textarea id="profession-input" class="form-control d-none" rows="3">{{ profile.profession }}</textarea>
-                        <div id="profession-buttons" class="text-end mt-2">
-                            <button class="btn btn-success btn-sm d-none" onclick="saveEdit('profession')">Save</button>
-                            <button class="btn btn-danger btn-sm ms-2 d-none" onclick="cancelEdit('profession', `{{ profile.profession|escapejs }}`)">Cancel</button>
-                            <button class="btn btn-primary btn-sm" onclick="enableEdit('profession')">Update</button>
-                        </div>
-                        {% endif %}
+                    </div>
+                    <div id="profession-buttons" class="text-end mt-2">
+                        <button class="btn btn-success btn-sm d-none" onclick="saveEdit('profession')">Save</button>
+                        <button class="btn btn-danger btn-sm ms-2 d-none" onclick="cancelEdit('profession', `{{ profile.profession|escapejs }}`)">Cancel</button>
+                        <button class="btn btn-secondary btn-sm" onclick="enableEdit('profession')">Update</button>
                     </div>
                 </li>
 
                 <!-- Bio Section -->
+                <!-- This section displays and allows editing of the user's bio -->
                 <li class="list-group-item">
                     <strong>Bio:</strong>
                     <div id="bio-section">
                         <p id="bio" class="text-wrap">{{ profile.bio|linebreaksbr }}</p>
-                        {% if is_own_profile %}
                         <textarea id="bio-input" class="form-control d-none" rows="5">{{ profile.bio }}</textarea>
-                        <div id="bio-buttons" class="text-end mt-2">
-                            <button class="btn btn-success btn-sm d-none" onclick="saveEdit('bio')">Save</button>
-                            <button class="btn btn-danger btn-sm ms-2 d-none" onclick="cancelEdit('bio', `{{ profile.bio|escapejs }}`)">Cancel</button>
-                            <button class="btn btn-primary btn-sm" onclick="enableEdit('bio')">Update</button>
-                        </div>
-                        {% endif %}
+                    </div>
+                    <div id="bio-buttons" class="text-end mt-2">
+                        <button class="btn btn-success btn-sm d-none" onclick="saveEdit('bio')">Save</button>
+                        <button class="btn btn-danger btn-sm ms-2 d-none" onclick="cancelEdit('bio', `{{ profile.bio|escapejs }}`)">Cancel</button>
+                        <button class="btn btn-secondary btn-sm" onclick="enableEdit('bio')">Update</button>
                     </div>
                 </li>
             </ul>
 
-            <!-- Navigation Buttons - Moved here -->
-            <div class="text-center mt-4">
-                <a href="{% url 'posts:post_list' %}" class="btn btn-primary">Back to Posts</a>
-                {% if is_own_profile %}
+            <!-- Buttons to navigate back to posts or log out -->
+            <div class="text-center mt-3 mb-1 bottom-buttons">
+                <a href="/" class="btn btn-secondary">Back to Posts</a>
                 <a href="{% url 'logout' %}" class="btn btn-danger">Logout</a>
-                {% endif %}
             </div>
         </div>
     </div>
 </div>
 
-<style>
-    .profile-picture-wrapper {
-        position: relative;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        margin-bottom: 20px;
-    }
-
-    .profile-picture {
-        width: 250px;
-        height: 250px;
-        border-radius: 50%;
-        border: 10px solid #34414b;
-        object-fit: cover;
-    }
-
-    .profile-picture-frame {
-        width: 250px;
-        height: 250px;
-        border-radius: 50%;
-        overflow: hidden;
-        position: relative;
-        border: 2px solid #34414b;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        margin-bottom: 20px;
-    }
-
-    #preview-picture {
-        width: 100%;
-        height: auto;
-        cursor: grab;
-    }
-
-    .update-button-wrapper {
-        display: flex;
-        justify-content: flex-end;
-        position: relative;
-        margin-top: 10px;
-    }
-
-    .update-button-wrapper button {
-        margin-right: 0px;
-    }
-
-    #update-button {
-        display: inline-block;
-    }
-
-    #upload-picture-button {
-        height: 35px;
-    }
-
-    #additional-container {
-        height: 35px;
-        width: 300px;
-        background-color: #f8f9fa;
-        border: 0px solid #34414b;
-        border-radius: 4px;
-    }
-
-    #additional-container p {
-        margin: 0;
-        font-size: 14px;
-        text-align: center;
-    }
-
-    .list-group-item {
-        padding: 15px;
-        margin-bottom: 15px;
-        padding: 20px;
-        border-radius: 20px;
-        border: 4px solid #34414b;
-    }
-
-    .list-group-item:first-child {
-        border-top-left-radius: 20px;
-        border-top-right-radius: 20px;
-    }
-
-    .list-group-item:last-child {
-        border-top: 4px solid #34414b;
-        border-bottom-left-radius: 20px;
-        border-bottom-right-radius: 20px;
-        margin-bottom: 0;
-    }
-
-    .list-group-item:not(:first-child):not(:last-child) {
-        border-top: 4px solid #34414b;
-        border-radius: 10px;
-    }
-
-    .card.mx-auto {
-        background-color: #f8f9fa;
-        border-radius: 30px;
-        padding: 20px;
-        border: 4px solid #34414b;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    }
-
-    #profile-page .btn {
-        border-width: 2px;
-        padding: 8px 12px;
-        font-size: 14px;
-    }
-
-    /* Additional styling for text elements */
-    .text-wrap {
-        word-break: break-word;
-        margin-bottom: 10px;
-    }
-
-    /* Form control styling */
-    .form-control {
-        border: 2px solid #34414b;
-        border-radius: 10px;
-    }
-
-    .form-control:focus {
-        border-color: #34414b;
-        box-shadow: 0 0 0 0.2rem rgba(52, 65, 75, 0.25);
-    }
-
-    /* Button hover effects */
-    .btn-secondary:hover {
-        background-color: #5a6268;
-        border-color: #545b62;
-    }
-
-    .btn-success:hover {
-        background-color: #218838;
-        border-color: #1e7e34;
-    }
-
-    .btn-danger:hover {
-        background-color: #c82333;
-        border-color: #bd2130;
-    }
-
-    /* Smooth transitions */
-    .btn, .form-control {
-        transition: all 0.3s ease;
-    }
-
-    /* Profile section spacing */
-    #username-section, #email-section, #profession-section, #bio-section {
-        margin-top: 5px;
-    }
-
-    /* Navigation buttons container */
-    .text-center.mt-3 {
-        margin-bottom: 30px;
-    }
-
-    /* Button spacing */
-    .text-center.mt-3 .btn {
-        margin: 0 5px;
-    }
-
-    /* Add this new style */
-    .card-body .text-center.mt-4 {
-        margin-top: 2rem !important;
-        padding-top: 1rem;
-    }
-
-    /* Button Styling */
-    .btn {
-        border-width: 2px;
-        padding: 6px 12px;
-        font-weight: 500;
-        border-radius: 4px;
-        transition: all 0.3s ease;
-    }
-
-    .btn-sm {
-        padding: 4px 8px;
-        font-size: 14px;
-    }
-
-    .btn-primary {
-        background-color: #34414b;
-        border-color: #34414b;
-        color: white;
-    }
-
-    .btn-primary:hover {
-        background-color: #2c3840;
-        border-color: #2c3840;
-        transform: translateY(-1px);
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
-
-    .btn-success {
-        background-color: #198754;
-        border-color: #198754;
-        color: white;
-    }
-
-    .btn-success:hover {
-        background-color: #157347;
-        border-color: #146c43;
-        transform: translateY(-1px);
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
-
-    .btn-danger {
-        background-color: #dc3545;
-        border-color: #dc3545;
-    }
-
-    .btn-danger:hover {
-        background-color: #c82333;
-        border-color: #bd2130;
-        transform: translateY(-1px);
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
-
-    /* Button spacing */
-    .btn + .btn {
-        margin-left: 8px;
-    }
-
-    /* Button container spacing */
-    .text-end.mt-2 {
-        margin-top: 1rem !important;
-    }
-
-    /* Navigation buttons specific styling */
-    .text-center.mt-4 .btn {
-        min-width: 100px;
-        margin: 0 5px;
-    }
-</style>
-
 <script>
+
 let cropper;
 
 function loadAndDisplayImage(event) {
@@ -389,12 +219,13 @@ function loadAndDisplayImage(event) {
 
     if (fileInput.files && fileInput.files.length > 0) {
         const file = fileInput.files[0];
-        filePathContainer.textContent = file.name;
+        filePathContainer.textContent = file.name; // Display the file path
 
         const reader = new FileReader();
         reader.onload = function (e) {
             previewPicture.src = e.target.result;
 
+            // Initialize Cropper.js
             if (cropper) {
                 cropper.destroy();
             }
@@ -411,7 +242,7 @@ function loadAndDisplayImage(event) {
         };
         reader.readAsDataURL(file);
     } else {
-        filePathContainer.textContent = 'No Selection';
+        filePathContainer.textContent = 'No Selection'; // Default if no file is selected
     }
 }
 
@@ -426,19 +257,21 @@ function saveProfilePicture() {
             const formData = new FormData();
             formData.append('image', blob, 'profile-picture.png');
 
-            fetch(window.location.pathname, {
+            // Send the cropped image to the server
+            fetch('/accounts/profile/', {
                 method: 'POST',
                 headers: {
-                    'X-CSRFToken': getCookie('csrftoken'),
+                    'X-CSRFToken': '{{ csrf_token }}', // Django's CSRF token
                 },
                 body: formData,
             })
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
+                    // Update the displayed profile picture
                     document.getElementById('profile-picture').src = data.profile_picture_url;
                     alert('Profile picture updated successfully!');
-                    cancelProfilePictureEdit();
+                    cancelProfilePictureEdit(); // Close the editing modal
                 } else {
                     alert('Error: ' + data.error);
                 }
@@ -451,146 +284,433 @@ function saveProfilePicture() {
     }
 }
 
-function enableProfilePictureEdit() {
-    document.getElementById('profile-picture').style.display = 'none';
-    document.getElementById('profile-picture-edit').classList.remove('d-none');
-    document.getElementById('update-button').style.display = 'none';
-}
-
 function cancelProfilePictureEdit() {
     if (cropper) {
         cropper.destroy();
     }
     document.getElementById('profile-picture-edit').classList.add('d-none');
-    document.getElementById('profile-picture').style.display = 'block';
-    document.getElementById('update-button').style.display = 'inline-block';
     document.getElementById('file-path').textContent = 'No Selection';
 }
 
-function enableEdit(field) {
-    document.getElementById(`${field}`).classList.add('d-none');
-    document.getElementById(`${field}-input`).classList.remove('d-none');
-    const buttons = document.getElementById(`${field}-buttons`);
-    buttons.querySelector('.btn-success').classList.remove('d-none');
-    buttons.querySelector('.btn-danger').classList.remove('d-none');
-    buttons.querySelector('.btn-secondary').classList.add('d-none');
-}
 
-function cancelEdit(field, originalValue) {
-    const input = document.getElementById(`${field}-input`);
-    const buttons = document.getElementById(`${field}-buttons`);
-
-    input.classList.add('d-none');
-    input.value = originalValue;
-    document.getElementById(`${field}`).classList.remove('d-none');
-
-    buttons.querySelector('.btn-success').classList.add('d-none');
-    buttons.querySelector('.btn-danger').classList.add('d-none');
-    buttons.querySelector('.btn-secondary').classList.remove('d-none');
-}
-
-function saveEdit(field) {
-    const inputElement = document.getElementById(`${field}-input`);
-    const newValue = inputElement.value;
-
-    fetch(window.location.pathname, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRFToken': getCookie('csrftoken'),
-        },
-        body: JSON.stringify({ [field]: newValue })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (!data.error) {
-            document.getElementById(`${field}`).innerText = newValue;
-            cancelEdit(field, newValue);
+        // Function to update the container with the selected file path
+    function displaySelectedFilePath() {
+        const fileInput = document.getElementById('file-input');
+        const filePathContainer = document.getElementById('file-path');
+        if (fileInput.files && fileInput.files.length > 0) {
+            filePathContainer.textContent = fileInput.files[0].name; // Display the file name
         } else {
-            alert('Error: ' + data.error);
+            filePathContainer.textContent = 'No Selection'; // Default message if no file is selected
         }
-    })
-    .catch(err => {
-        console.error('Error:', err);
-        alert('An error occurred while saving the changes.');
-    });
-}
-
-function enablePasswordEdit() {
-    document.getElementById('password').classList.add('d-none');
-    document.getElementById('password-edit').classList.remove('d-none');
-    const buttons = document.getElementById('password-buttons');
-    buttons.querySelector('.btn-success').classList.remove('d-none');
-    buttons.querySelector('.btn-danger').classList.remove('d-none');
-    buttons.querySelector('.btn-secondary').classList.add('d-none');
-}
-
-function cancelPasswordEdit() {
-    document.getElementById('password').classList.remove('d-none');
-    document.getElementById('password-edit').classList.add('d-none');
-    const buttons = document.getElementById('password-buttons');
-    buttons.querySelector('.btn-success').classList.add('d-none');
-    buttons.querySelector('.btn-danger').classList.add('d-none');
-    buttons.querySelector('.btn-secondary').classList.remove('d-none');
-}
-
-function savePassword() {
-    const currentPassword = document.getElementById('current-password').value;
-    const newPassword = document.getElementById('new-password').value;
-    const confirmPassword = document.getElementById('confirm-password').value;
-
-    if (!currentPassword || !newPassword || !confirmPassword) {
-        alert("Please fill out all password fields.");
-        return;
     }
 
-    if (newPassword !== confirmPassword) {
-        alert("New password and confirm password do not match.");
-        return;
+    // Function to enable edit mode for fields
+    function enableEdit(field) {
+        document.getElementById(`${field}`).classList.add('d-none');
+        document.getElementById(`${field}-input`).classList.remove('d-none');
+        const buttons = document.getElementById(`${field}-buttons`);
+        buttons.querySelector('.btn-success').classList.remove('d-none'); // Save
+        buttons.querySelector('.btn-danger').classList.remove('d-none'); // Cancel
+        buttons.querySelector('.btn-secondary').classList.add('d-none'); // Update
     }
 
-    fetch(window.location.pathname, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRFToken': getCookie('csrftoken'),
-        },
-        body: JSON.stringify({
-            current_password: currentPassword,
-            new_password: newPassword,
-            confirm_password: confirmPassword,
-        }),
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.error) {
-            alert("Error updating password: " + data.error);
-        } else {
-            cancelPasswordEdit();
-            alert("Password updated successfully!");
-        }
-    })
-    .catch(err => {
-        console.error("Error saving password:", err);
-        alert("An error occurred while updating the password.");
-    });
-}
+    // Function to cancel editing and revert changes
+    function cancelEdit(field, originalValue) {
+        const input = document.getElementById(`${field}-input`);
+        const buttons = document.getElementById(`${field}-buttons`);
 
-// Function to get CSRF token from cookies
-function getCookie(name) {
-    let cookieValue = null;
-    if (document.cookie && document.cookie !== '') {
-        const cookies = document.cookie.split(';');
-        for (let i = 0; i < cookies.length; i++) {
-            const cookie = cookies[i].trim();
-            if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                break;
+        input.classList.add('d-none');
+        input.value = originalValue;
+        document.getElementById(`${field}`).classList.remove('d-none');
+
+        buttons.querySelector('.btn-success').classList.add('d-none'); // Save
+        buttons.querySelector('.btn-danger').classList.add('d-none'); // Cancel
+        buttons.querySelector('.btn-secondary').classList.remove('d-none'); // Update
+    }
+
+    function cancelProfilePictureEdit() {
+        // Hide the edit controls
+        document.getElementById('profile-picture-edit').classList.add('d-none');
+
+        // Show the profile picture again
+        const profilePicture = document.getElementById('profile-picture');
+        if (profilePicture) {
+            profilePicture.style.display = 'block';
+        }
+
+        // Show the "Update" button again
+        const updateButton = document.getElementById('update-button'); // Use the correct ID
+        if (updateButton) {
+            updateButton.style.display = 'inline-block'; // Make the button visible
+        }
+
+        // If cropper instance exists, destroy it (if applicable)
+        if (typeof cropper !== 'undefined' && cropper) {
+            cropper.destroy();
+        }
+    }
+
+    // Function to save edited data for a field
+    function saveEdit(field) {
+        const inputElement = document.getElementById(`${field}-input`);
+        const newValue = inputElement.value;
+
+        fetch('/accounts/profile/', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-CSRFToken': '{{ csrf_token }}' },
+            body: JSON.stringify({ [field]: newValue })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (!data.error) {
+                document.getElementById(`${field}`).innerText = newValue;
+                cancelEdit(field, newValue);
             }
+        });
+    }
+    // Enable password edit mode
+    function enablePasswordEdit() {
+        // Hide password text and show input fields
+        document.getElementById('password').classList.add('d-none');
+        document.getElementById('password-edit').classList.remove('d-none');
+
+        // Show Save and Cancel buttons, hide Update button
+        const buttons = document.getElementById('password-buttons');
+        buttons.querySelector('.btn-success').classList.remove('d-none'); // Save
+        buttons.querySelector('.btn-danger').classList.remove('d-none'); // Cancel
+        buttons.querySelector('.btn-secondary').classList.add('d-none'); // Update
+    }
+
+    function enableProfilePictureEdit() {
+        // Hide the profile picture
+         document.getElementById('profile-picture').style.display = 'none';
+        // Show the edit controls
+        document.getElementById('profile-picture-edit').classList.remove('d-none');
+        
+        // Hide the "Update" button
+        const updateButton = document.getElementById('update-button');
+        if (updateButton) {
+            updateButton.style.display = 'none'; // Hide the button
         }
     }
-    return cookieValue;
-}
+
+    function cancelProfilePictureEdit() {
+        // Hide the edit controls
+        document.getElementById('profile-picture-edit').classList.add('d-none');
+
+        // Show the profile picture again
+        const profilePicture = document.getElementById('profile-picture');
+        if (profilePicture) {
+            profilePicture.style.display = 'block';
+        }
+
+        // Show the "Update" button again
+        const updateButton = document.getElementById('update-button');
+        if (updateButton) {
+            updateButton.style.display = 'inline-block'; // Make the button visible
+        }
+
+        // If cropper instance exists, destroy it
+        if (typeof cropper !== 'undefined' && cropper) {
+            cropper.destroy();
+        }
+    }
+
+
+    // Cancel password edit mode
+    function cancelPasswordEdit() {
+        // Show password text and hide input fields
+        document.getElementById('password').classList.remove('d-none');
+        document.getElementById('password-edit').classList.add('d-none');
+
+        // Hide Save and Cancel buttons, show Update button
+        const buttons = document.getElementById('password-buttons');
+        buttons.querySelector('.btn-success').classList.add('d-none'); // Save
+        buttons.querySelector('.btn-danger').classList.add('d-none'); // Cancel
+        buttons.querySelector('.btn-secondary').classList.remove('d-none'); // Update
+    }
+
+    // Save password
+    function savePassword() {
+        const currentPassword = document.getElementById('current-password').value;
+        const newPassword = document.getElementById('new-password').value;
+        const confirmPassword = document.getElementById('confirm-password').value;
+
+        // Validation: Ensure all fields are filled out
+        if (!currentPassword || !newPassword || !confirmPassword) {
+            alert("Please fill out all password fields.");
+            return;
+        }
+
+        // Validation: Ensure new password and confirm password match
+        if (newPassword !== confirmPassword) {
+            alert("New password and confirm password do not match.");
+            return;
+        }
+
+        // Send request to the server
+        fetch('/accounts/profile/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}',
+            },
+            body: JSON.stringify({
+                current_password: currentPassword,
+                new_password: newPassword,
+                confirm_password: confirmPassword,
+            }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                alert("Error updating password: " + data.error);
+            } else {
+                // Reset fields and revert to non-edit mode
+                cancelPasswordEdit();
+                alert("Password updated successfully!");
+            }
+        })
+        .catch(err => {
+            console.error("Error saving password:", err);
+            alert("An error occurred while updating the password.");
+        });
+    }
+
 </script>
+
+<style>
+    .profile-picture-wrapper {
+        position: relative;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-bottom: 20px; /* Add space below the profile picture */
+    }
+
+    .profile-picture {
+        width: 250px;
+        height: 250px;
+        border-radius: 50%;
+        border: 10px solid #444;
+        object-fit: cover;
+    }
+
+    .profile-picture-frame {
+        width: 250px;
+        height: 250px;
+        border-radius: 50%;
+        overflow: hidden;
+        position: relative;
+        border: 2px solid #444;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-bottom: 20px; /* Add space below the frame */
+    }
+
+    #preview-picture {
+        width: 100%;
+        height: auto;
+        cursor: grab;
+    }
+
+    .update-button-wrapper {
+        display: flex;
+        justify-content: flex-end; /* Align to the right */
+        position: relative; /* Allows independent positioning */
+        margin-top: 10px; /* Add spacing from the profile picture */
+    }
+
+    .update-button-wrapper button {
+        margin-right: 0px; /* Spacing from the right edge */
+    }
+
+    #update-button {
+    display: inline-block; /* Ensure it defaults to visible */
+    }
+
+    #upload-picture-button {
+        height: 35px; /* Adjust to match the desired height */
+    }
+
+    #additional-container {
+        height: 35px; /* Matches the button height */
+        width: 300px; /* Fixed width to fit profile field */
+        background-color: #f8f9fa; /* Light gray background */
+        border: 0px solid #ced4da; /* Light gray border */
+        border-radius: 4px; /* Rounded corners for a consistent look */
+    }
+
+    #additional-container p {
+        margin: 0; /* Remove default margin for the text */
+        font-size: 14px; /* Font size for readability */
+        text-align: center; /* Center-align the text */
+    }
+
+    .profile-picture-frame {
+        width: 250px;
+        height: 250px;
+        border-radius: 50%;
+        overflow: hidden;
+        border: 2px solid #ddd;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin: 0 auto;
+    }
+
+    #preview-picture {
+        display: block;
+        max-width: 100%;
+        cursor: grab;
+    }
+
+    #additional-container {
+        height: 35px; 
+        width: 300px; 
+        background-color: #f8f9fa; 
+        border: 1px solid #ced4da; 
+        border-radius: 4px; 
+    }
+
+    #additional-container p {
+        margin: 0; 
+        font-size: 14px; 
+        text-align: center; 
+    }
+
+        /* Thicker borders for list items */
+        .list-group-item {
+        border: 20px solid #ccc; /* Increase border thickness */
+       
+        
+    }
+
+    /* Thicker border for the profile picture frame */
+    .profile-picture-frame {
+        border: 4px solid #444; /* Increase border thickness for the profile picture frame */
+    }
+
+    /* Thicker border for additional container */
+    #additional-container {
+        border: 3px solid #ced4da; /* Thicker border for the file path container */
+    }
+
+    /* Thicker border for the buttons */
+    .btn {
+        border-width: 2px; /* Increase the border thickness of buttons */
+    }
+
+    /* Card border for the entire profile container */
+    .card {
+        border: 3px solid #ddd; /* Thicker border for the profile card */
+    }
+
+    /* Add padding for better spacing */
+    .list-group-item {
+        padding: 15px; /* Increase padding for better visibility of thicker borders */
+        margin-bottom: 15px; /* Add space below each item */
+        padding: 20px; /* Optional: Increase padding inside each item */
+        border-radius: 20px; /* Optional: Add rounded corners for better aesthetics */
+        border: 4px solid #444; /* Ensure a clean separation with borders */
+    }
+
+    .list-group-item:first-child {
+        border-top-left-radius: 20px;
+        border-top-right-radius: 20px;
+    }
+
+    /* Remove spacing for the last list item (optional) */
+    .list-group-item:last-child {
+        border-top: 4px solid #444; /* Explicitly define top border */
+        border-bottom-left-radius: 20px;
+        border-bottom-right-radius: 20px;
+        margin-bottom: 0;
+    
+    }
+
+    /* Ensure borders are fully visible for intermediate list items */
+    .list-group-item:not(:first-child):not(:last-child) {
+        border-top: 4px solid #444; /* Explicitly define top border */
+        border-radius: 10px; /* Reset radius for intermediate items */
+    }
+
+    /* Custom background color for the card */
+    .card.mx-auto {
+        background-color: #f8f9fa; /* Light gray background (adjust to your preference) */
+        border-radius: 30px; /* Optional: Rounded corners for a polished look */
+        padding: 20px; /* Optional: Add padding inside the card */
+        border: 4px solid #444; /* Optional: Ensure the card border stands out */
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Optional: Add a subtle shadow */
+    }    
+
+    
+    /* Scoped button styles for the profile page */
+    #profile-page .btn {
+        border-width: 2px; /* Border thickness for profile buttons */
+        padding: 8px 12px; /* Profile page button padding */
+        font-size: 14px; /* Profile page button font size */
+    }
+
+    /* Reset global navbar button styles */
+    .navbar .btn {
+        border-width: 1px;
+        padding: 6px 10px;
+        font-size: 14px;
+        line-height: 1.5;
+    }
+
+    .bottom-buttons {
+        margin: 30px auto;
+        padding: 15px;
+        background-color: #f8f9fa;
+        border-radius: 10px;
+        max-width: 800px; /* Match the card width */
+    }
+
+    .bottom-buttons .btn {
+        margin: 0 5px;
+    }
+
+    .registration-ranks-container {
+        list-style: none;
+        padding: 0;
+        margin-bottom: 15px;
+    }
+
+    .registration-ranks-container .list-group-item {
+        margin: 0;  /* Reset margin since they're side by side */
+    }
+
+    /* Make Registration Type frame narrower */
+    .registration-ranks-container .list-group-item:first-child {
+        margin-right: 4px;  /* Half of the gap-2 (8px) */
+        flex: 0 0 30%;  /* Keep the Registration Type width */
+    }
+
+    .registration-ranks-container .list-group-item:last-child {
+        margin-left: 4px;  /* Half of the gap-2 (8px) */
+        flex: 0 0 68%;  /* Increase to align with other frames */
+        margin-right: 0;  /* Remove the right margin */
+    }
+
+    /* Add custom style for bigger badges */
+    .registration-ranks-container .badge {
+        font-size: 1.1rem;
+        padding: 8px 16px;
+        margin: 5px;
+        border-radius: 6px;
+    }
+
+    #profile-page {
+        margin-bottom: 50px; /* Add bottom margin to the profile page */
+    }
+
+</style>
+
+
+</style>
+
 
 {% endblock %}

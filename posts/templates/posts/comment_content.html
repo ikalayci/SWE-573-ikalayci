@@ -1,0 +1,301 @@
+{% load static %}
+
+<div class="comment-structure">
+    <!-- First Line: username, badge, and buttons -->
+    <div class="d-flex justify-content-between align-items-center mb-2">
+        <div class="d-flex align-items-center">
+            {% if user.is_superuser %}
+                <button class="btn btn-link text-danger p-0 me-3 d-flex align-items-center" 
+                        onclick="deleteComment({{ comment.id }})"
+                        title="Delete Comment"
+                        style="height: 24px;">
+                    <i class="fas fa-trash"></i>
+                </button>
+            {% endif %}
+            <!-- Username -->
+            <strong class="me-2">
+                {% if comment.is_anonymous %}
+                    Anonymous
+                {% else %}
+                    {{ comment.get_username }}
+                {% endif %}
+            </strong>
+
+            <!-- Comment Type Badge -->
+            <span class="badge {% if comment.comment_type == 'question' %}badge-question{% elif comment.comment_type == 'answer' %}badge-answer{% else %}badge-hint{% endif %}">
+                {{ comment.get_comment_type_display }}
+            </span>
+        </div>
+
+        <!-- Buttons Group -->
+        <div class="d-flex align-items-center gap-3">
+            <div class="vote-group">
+                <button class="vote-btn {% if user in comment.upvotes.all %}active{% endif %}" 
+                        onclick="voteComment({{ comment.id }}, 'up')"
+                        {% if user == comment.user %}disabled{% endif %}>
+                    <i class="fas fa-arrow-up"></i>
+                    <span class="vote-count upvotes" id="upvotes-{{ comment.id }}">{{ comment.upvotes.count }}</span>
+                </button>
+                <button class="vote-btn {% if user in comment.downvotes.all %}active{% endif %}" 
+                        onclick="voteComment({{ comment.id }}, 'down')"
+                        {% if user == comment.user %}disabled{% endif %}>
+                    <i class="fas fa-arrow-down"></i>
+                    <span class="vote-count downvotes" id="downvotes-{{ comment.id }}">{{ comment.downvotes.count }}</span>
+                </button>
+            </div>
+            {% if post.user == user and post.status == 'unsolved' and comment.user != user and comment.comment_type != 'question' %}
+                <i class="fas fa-trophy winner-select-icon" 
+                   onclick="selectWinnerAndSolve({{ comment.id }})"
+                   data-comment-id="{{ comment.id }}"
+                   title="Select as Winner"></i>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Second Line: Timestamp and Links -->
+    <div class="d-flex align-items-center mb-2">
+        <small class="text-muted me-3">{{ comment.created_at }}</small>
+        {% if comment.comment_type == 'hint' %}
+            {% if comment.wikidata_link %}
+                <a href="{{ comment.wikidata_link }}" target="_blank" class="text-decoration-none me-2">
+                    <small class="text-muted">
+                        <i class="fas fa-external-link-alt"></i> Wikidata Link
+                    </small>
+                </a>
+            {% endif %}
+            {% if comment.hint_link %}
+                <a href="{{ comment.hint_link }}" target="_blank" class="text-decoration-none">
+                    <small class="text-muted">
+                        <i class="fas fa-external-link-alt"></i> Reference Link
+                    </small>
+                </a>
+            {% endif %}
+        {% endif %}
+        {% if comment.comment_type == 'answer' and comment.answer_link %}
+            <a href="{{ comment.answer_link }}" target="_blank" class="text-decoration-none">
+                <small class="text-muted">
+                    <i class="fas fa-external-link-alt"></i> Reference Link
+                </small>
+            </a>
+        {% endif %}
+    </div>
+
+    <!-- Third Line: User Ranks -->
+    {% if not comment.is_anonymous and comment.user and comment.user.profile.ranks %}
+        <div class="user-ranks mb-2">
+            {% for rank in comment.user.profile.ranks %}
+                <span class="badge badge-mysteries-slayer" data-rank="{{ rank }}">{{ rank }}</span>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <!-- Fourth Line: Comment Content -->
+    <p class="comment-content mb-0">{{ comment.content }}</p>
+</div>
+
+<style>
+.badge {
+    font-size: 0.75rem;
+    padding: 0.25em 0.6em;
+    color: white;
+    display: inline-flex;
+    align-items: center;
+    height: 24px;
+}
+
+.badge-question {
+    background-color: #CC99FF !important; /* Light Purple */
+    border: 1px solid #b385e6;
+}
+
+.badge-answer {
+    background-color: #00CC99 !important; /* Turquoise */
+    border: 1px solid #00b386;
+}
+
+.badge-hint {
+    background-color: #33CCCC !important; /* Darker Cyan */
+    border: 1px solid #2eb8b8;
+}
+
+.user-ranks {
+    margin-top: 0.25rem;
+}
+
+.badge-mysteries-slayer[data-rank="Mysteries Slayer"] {
+    background-color: #006699 !important;
+}
+
+.badge-mysteries-slayer[data-rank="Master of Hints"] {
+    background-color: #33CCCC !important;
+}
+
+.badge-mysteries-slayer[data-rank="Questioner"] {
+    background-color: #CC99FF !important;
+}
+
+.badge-mysteries-slayer[data-rank="Best Respondent"] {
+    background-color: #00CC99 !important;
+}
+
+.badge-mysteries-slayer[data-rank="Popular"] {
+    background-color: #0066FF !important;
+}
+
+.badge-mysteries-slayer[data-rank="Mystery Bringer"] {
+    background-color: #CC0099 !important;
+}
+
+.badge-mysteries-slayer[data-rank="Beginner"] {
+    background-color: #F69200 !important;
+}
+
+.badge-mysteries-slayer[data-rank="Moderate"] {
+    background-color: #FF5050 !important;
+}
+
+.badge-mysteries-slayer[data-rank="Trailwhisper"] {
+    background-color: #FF5050 !important;
+}
+
+.badge-mysteries-slayer[data-rank="Mysterion"] {
+    background-color: #006699 !important;
+}
+
+.badge-mysteries-slayer[data-rank="Hintarion"] {
+    background-color: #33CCCC !important;
+}
+
+.badge-mysteries-slayer[data-rank="Luminarch"] {
+    background-color: #00CC99 !important;
+}
+
+.badge-mysteries-slayer[data-rank="Querysmith"] {
+    background-color: #CC99FF !important;
+}
+
+.badge-mysteries-slayer[data-rank="Cloutcaster"] {
+    background-color: #0066FF !important;
+}
+
+.badge-mysteries-slayer[data-rank="Riddlecaster"] {
+    background-color: #CC0099 !important;
+}
+
+.vote-btn.active {
+    color: inherit;
+    font-weight: bold;
+}
+
+.vote-btn.active[onclick*="up"] {
+    color: #28a745;
+    background-color: rgba(40, 167, 69, 0.1);
+}
+
+.vote-btn.active[onclick*="down"] {
+    color: #dc3545;
+    background-color: rgba(220, 53, 69, 0.1);
+}
+
+.vote-btn:hover {
+    opacity: 0.8;
+    cursor: pointer;
+}
+
+.vote-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.winner-select-icon {
+    color: #198754;
+    font-size: 1.1rem;
+    cursor: pointer;
+    margin-left: 8px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+}
+
+.winner-select-icon:hover {
+    color: #146c43;  /* Darker shade of success color */
+    transform: scale(1.1);
+}
+
+.comment-structure {
+    padding: 10px 0;
+}
+
+.anonymous-avatar {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background-color: #e9ecef;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.comment-content {
+    color: #212529;
+    line-height: 1.5;
+}
+
+.vote-group {
+    display: flex;
+    align-items: center;
+    height: 24px;
+}
+
+.vote-btn {
+    display: flex;
+    align-items: center;
+    height: 24px;
+    padding: 0 5px;
+}
+</style>
+
+<script>
+function voteComment(commentId, voteType) {
+    fetch("{% url 'posts:vote_comment' 0 'up' %}".replace('0', commentId).replace('up', voteType), {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Update vote counts for all instances of this comment
+            document.querySelectorAll(`#upvotes-${commentId}`).forEach(element => {
+                element.textContent = data.upvotes_count;
+            });
+            document.querySelectorAll(`#downvotes-${commentId}`).forEach(element => {
+                element.textContent = data.downvotes_count;
+            });
+            
+            // Update button states for all instances of this comment
+            document.querySelectorAll(`button[onclick="voteComment(${commentId}, 'up')"]`).forEach(button => {
+                button.classList.remove('active');
+                if (data.user_vote === 'up') {
+                    button.classList.add('active');
+                }
+            });
+            
+            document.querySelectorAll(`button[onclick="voteComment(${commentId}, 'down')"]`).forEach(button => {
+                button.classList.remove('active');
+                if (data.user_vote === 'down') {
+                    button.classList.add('active');
+                }
+            });
+        } else {
+            alert(data.error || 'An error occurred while voting');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred while voting');
+    });
+}
+</script> 

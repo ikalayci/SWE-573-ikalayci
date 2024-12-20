@@ -55,10 +55,18 @@ class Post(models.Model):
 
     created_at = models.DateTimeField(auto_now_add=True)
 
+    winner_comment = models.ForeignKey(
+        'Comment',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='won_posts'
+    )
+
     def get_username(self):
         if self.user:
             return self.user.username
-        return self.deleted_username or "Deleted User"
+        return "Anonymous User"
 
     def __str__(self):
         return f"{self.title or 'No Title'} - {self.get_username()}"
@@ -112,21 +120,37 @@ class Post(models.Model):
         return parts[0] if parts else "Not Specified"
 
 class Comment(models.Model):
+    COMMENT_TYPES = [
+        ('question', 'Question'),
+        ('answer', 'Answer'),
+        ('hint', 'Hint')
+    ]
+    
     post = models.ForeignKey(Post, related_name='comments', on_delete=models.CASCADE)
-    user = models.ForeignKey(
-        User, 
-        on_delete=models.SET_NULL,
-        related_name='comments',
-        null=True,
-        blank=True
-    )
-    deleted_username = models.CharField(
-        max_length=150, 
-        default="",
-        blank=True
-    )
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, related_name='comments', null=True, blank=True)
     content = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
+    is_anonymous = models.BooleanField(default=False)
+    comment_type = models.CharField(max_length=20, choices=COMMENT_TYPES, default='answer')
+    wikidata_link = models.URLField(null=True, blank=True, help_text="Optional for hints. Must be a valid Wikidata URL")
+    hint_link = models.URLField(null=True, blank=True, help_text="Optional for hints. Must be a valid URL")
+    answer_link = models.URLField(null=True, blank=True, help_text="Required for answers. Must be a valid URL")
+    deleted_username = models.CharField(max_length=150, default="", blank=True)
+    
+    upvotes = models.ManyToManyField(
+        User, 
+        related_name='comment_upvotes',
+        blank=True
+    )
+    downvotes = models.ManyToManyField(
+        User, 
+        related_name='comment_downvotes',
+        blank=True
+    )
+
+    @property
+    def vote_score(self):
+        return self.upvotes.count() - self.downvotes.count()
 
     def get_username(self):
         if self.user:

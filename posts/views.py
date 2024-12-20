@@ -7,6 +7,9 @@ from .forms import PostCreationForm
 from django.db.models import Q
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
+from accounts.models import Profile
+from django.core.validators import URLValidator
+from django.core.exceptions import ValidationError
 
 
 
@@ -248,16 +251,64 @@ def post_list(request):
 
 
 
+@login_required
 def add_comment(request, post_id):
-    post = get_object_or_404(Post, id=post_id)
     if request.method == 'POST':
+        post = get_object_or_404(Post, id=post_id)
         content = request.POST.get('content')
-        if content:
-            user = request.user if request.user.is_authenticated else None
-            Comment.objects.create(post=post, user=user, content=content)
-            messages.success(request, 'Comment added successfully!')
-        else:
-            messages.error(request, 'Comment cannot be empty.')
+        is_anonymous = request.POST.get('is_anonymous') == 'on'
+        comment_type = request.POST.get('comment_type')
+        wikidata_link = request.POST.get('wikidata_link')
+        hint_link = request.POST.get('hint_link')
+        answer_link = request.POST.get('answer_link')
+        
+        if content and comment_type:
+            # Validate hint links
+            if comment_type == 'hint':
+                if not wikidata_link and not hint_link:
+                    messages.error(request, 'At least one link (Wikidata or web link) is required for hints')
+                    return redirect('posts:post_detail', post_id=post_id)
+                
+                if wikidata_link and not wikidata_link.startswith('https://www.wikidata.org/wiki/Q'):
+                    messages.error(request, 'Invalid Wikidata link format')
+                    return redirect('posts:post_detail', post_id=post_id)
+                
+                if hint_link:
+                    try:
+                        url_validator = URLValidator()
+                        url_validator(hint_link)
+                    except ValidationError:
+                        messages.error(request, 'Please enter a valid web link')
+                        return redirect('posts:post_detail', post_id=post_id)
+            
+            # Validate answer link
+            if comment_type == 'answer':
+                if not answer_link:
+                    messages.error(request, 'Web link is required for answers')
+                    return redirect('posts:post_detail', post_id=post_id)
+                try:
+                    url_validator = URLValidator()
+                    url_validator(answer_link)
+                except ValidationError:
+                    messages.error(request, 'Please enter a valid URL')
+                    return redirect('posts:post_detail', post_id=post_id)
+            
+            comment = Comment.objects.create(
+                post=post,
+                user=request.user,
+                content=content,
+                is_anonymous=is_anonymous,
+                comment_type=comment_type,
+                wikidata_link=wikidata_link if comment_type == 'hint' else None,
+                hint_link=hint_link if comment_type == 'hint' else None,
+                answer_link=answer_link if comment_type == 'answer' else None
+            )
+            
+            if is_anonymous:
+                comment.deleted_username = "Anonymous"
+                comment.save()
+                
+        return redirect('posts:post_detail', post_id=post_id)
     return redirect('posts:post_list')
 
 
@@ -301,7 +352,16 @@ def categorize_color(hex_color):
 
 
 def post_detail(request, post_id):
-    post = get_object_or_404(Post, id=post_id)
+    post = get_object_or_404(
+        Post.objects.select_related('user__profile')
+        .prefetch_related(
+            'comments__user__profile',
+            'comments__upvotes',
+            'comments__downvotes'
+        ), 
+        id=post_id
+    )
+    
     # Process the same attributes as in post_list view
     post.split_colors = post.colors.split(',') if post.colors else []
     post.split_materials = post.materials.split(', ') if post.materials else []
@@ -358,45 +418,145 @@ def get_field_suggestions(request):
 
 
 @require_POST
-@login_required
 def update_post_status(request, post_id):
-    print(f"Received status update request for post {post_id}")  # Debug print
-    print(f"Request user: {request.user}, Is superuser: {request.user.is_superuser}")  # Debug print
-    
+    if not request.user.is_authenticated:
+        return JsonResponse({'success': False, 'error': 'Authentication required'}, status=403)
+        
     try:
-        post = Post.objects.get(id=post_id)
-        print(f"Post owner: {post.user}")  # Debug print
-        
-        # Allow both post owner and admin to update status
-        if not (request.user == post.user or request.user.is_superuser):
-            print("Unauthorized: User is neither owner nor admin")  # Debug print
-            return JsonResponse({
-                'success': False, 
-                'error': 'Unauthorized'
-            }, status=403)
-
         data = json.loads(request.body)
-        new_status = data.get('status')
-        print(f"New status: {new_status}")  # Debug print
+        post = Post.objects.get(pk=post_id)
         
-        post.status = new_status
+        if request.user != post.user and not request.user.is_superuser:
+            return JsonResponse({'success': False, 'error': 'Not authorized'}, status=403)
+            
+        status = data.get('status')
+        winner_comment_id = data.get('winner_comment_id')
+        
+        if status == 'solved' and winner_comment_id:
+            try:
+                winner_comment = Comment.objects.get(pk=winner_comment_id)
+                post.winner_comment = winner_comment
+                
+                # Update ranks for all users when a post is solved
+                for profile in Profile.objects.all():
+                    profile.update_ranks()
+                    
+            except Comment.DoesNotExist:
+                return JsonResponse({'success': False, 'error': 'Comment not found'})
+                
+        post.status = status
         post.save()
         
-        return JsonResponse({
-            'success': True,
-            'message': f'Status updated to {new_status}'
-        })
+        return JsonResponse({'success': True})
         
     except Post.DoesNotExist:
-        print(f"Post {post_id} not found")  # Debug print
-        return JsonResponse({
-            'success': False, 
-            'error': 'Post not found'
-        }, status=404)
+        return JsonResponse({'success': False, 'error': 'Post not found'})
+    except json.JSONDecodeError:
+        return JsonResponse({'success': False, 'error': 'Invalid JSON'})
     except Exception as e:
-        print(f"Error updating status: {str(e)}")  # Debug print
+        return JsonResponse({'success': False, 'error': str(e)})
+
+
+@login_required
+@require_POST
+def vote_comment(request, comment_id, vote_type):
+    comment = get_object_or_404(Comment, id=comment_id)
+    user = request.user
+    
+    # Check if the user is trying to vote on their own comment
+    if comment.user == user:
         return JsonResponse({
-            'success': False, 
+            'success': False,
+            'error': 'You cannot vote on your own comment'
+        })
+    
+    # Check if the user is trying to undo their vote
+    if vote_type == 'up' and user in comment.upvotes.all():
+        comment.upvotes.remove(user)
+        user_vote = None
+    elif vote_type == 'down' and user in comment.downvotes.all():
+        comment.downvotes.remove(user)
+        user_vote = None
+    else:
+        # Remove any existing votes by this user
+        comment.upvotes.remove(user)
+        comment.downvotes.remove(user)
+        
+        # Add the new vote
+        if vote_type == 'up':
+            comment.upvotes.add(user)
+            user_vote = 'up'
+        elif vote_type == 'down':
+            comment.downvotes.add(user)
+            user_vote = 'down'
+    
+    return JsonResponse({
+        'success': True,
+        'upvotes_count': comment.upvotes.count(),
+        'downvotes_count': comment.downvotes.count(),
+        'user_vote': user_vote
+    })
+
+
+@login_required
+def delete_comment(request, comment_id):
+    if not request.user.is_superuser:
+        return JsonResponse({
+            'success': False,
+            'error': 'Only administrators can delete comments'
+        }, status=403)
+
+    try:
+        comment = get_object_or_404(Comment, id=comment_id)
+        
+        # Check if this comment is a winner comment of any post
+        winner_post = Post.objects.filter(winner_comment=comment).first()
+        if winner_post:
+            # Update post status to unsolved and remove winner comment reference
+            winner_post.status = 'unsolved'
+            winner_post.winner_comment = None
+            winner_post.save()
+            
+            # Update ranks for all users since a winner was removed
+            for profile in Profile.objects.all():
+                profile.update_ranks()
+        
+        comment.delete()
+        return JsonResponse({'success': True})
+    except Exception as e:
+        return JsonResponse({
+            'success': False,
             'error': str(e)
         }, status=500)
+
+
+@login_required
+def select_winner(request, post_id, comment_id):
+    if request.method == 'POST':
+        post = get_object_or_404(Post, id=post_id)
+        comment = get_object_or_404(Comment, id=comment_id)
+
+        # Check if the user is the post owner
+        if request.user != post.user:
+            return JsonResponse({'success': False, 'error': 'Only the post owner can select a winner'}, status=403)
+
+        # Check if the comment is not a question
+        if comment.comment_type == 'question':
+            return JsonResponse({'success': False, 'error': 'Question comments cannot be selected as winners'}, status=400)
+
+        # Check if the comment is not from the post owner
+        if comment.user == post.user:
+            return JsonResponse({'success': False, 'error': 'You cannot select your own comment as winner'}, status=400)
+
+        # Update post status and winner
+        post.status = 'solved'
+        post.winner_comment = comment
+        post.save()
+
+        # Update ranks for all users
+        for profile in Profile.objects.all():
+            profile.update_ranks()
+
+        return JsonResponse({'success': True})
+    return JsonResponse({'success': False, 'error': 'Invalid request method'}, status=405)
 

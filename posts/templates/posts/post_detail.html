@@ -14,10 +14,9 @@
 {% endif %}
 
 <div class="container-fluid mt-4">
-    <div class="row gx-2">
-        <!-- Left Column -->
-        <div class="col-4 px-1">
-            <div class="card h-100">
+    <div class="row justify-content-center">
+        <div class="col-lg-11">
+            <div class="card">
                 <div class="card-body">
                     <!-- Status Switch - Visible to post owner and admins -->
                     {% if user == post.user or user.is_superuser %}
@@ -35,19 +34,19 @@
                     <!-- User Info with Profile Picture -->
                     <div class="user-info mb-4">
                         <div class="d-flex align-items-center">
-                            <div class="me-3">
+                            <div class="me-4">
                                 {% if post.user %}
                                     <a href="{% url 'user_profile' post.user.username %}">
                                         {% if post.user.profile.profile_picture %}
                                             <img src="{{ post.user.profile.profile_picture.url }}" 
                                                  alt="Profile picture" 
                                                  class="rounded-circle profile-pic"
-                                                 style="width: 40px; height: 40px; object-fit: cover;">
+                                                 style="width: 100px; height: 100px; object-fit: cover; border: 3px solid #34414b;">
                                         {% else %}
                                             <img src="{% static 'images/default_profile.png' %}" 
                                                  alt="Default profile picture" 
                                                  class="rounded-circle profile-pic"
-                                                 style="width: 40px; height: 40px; object-fit: cover;">
+                                                 style="width: 100px; height: 100px; object-fit: cover; border: 3px solid #34414b;">
                                         {% endif %}
                                     </a>
                                 {% else %}
@@ -57,7 +56,7 @@
                                 {% endif %}
                             </div>
                             <div>
-                                <h5 class="mb-0">
+                                <h5 class="mb-2 fs-3">
                                     {% if post.user %}
                                         <a href="{% url 'user_profile' post.user.username %}" 
                                            class="text-decoration-none text-dark">
@@ -67,26 +66,56 @@
                                         <span class="deleted-username">{{ post.get_username }}</span>
                                     {% endif %}
                                 </h5>
-                                <small class="text-muted">Posted on {{ post.created_at }}</small>
+                                <small class="text-muted d-block mb-2 fs-6">Posted on {{ post.created_at }}</small>
+                                {% if post.user %}
+                                    <div class="user-ranks">
+                                        {% if post.user.profile.ranks %}
+                                            {% for rank in post.user.profile.ranks %}
+                                                <span class="badge badge-mysteries-slayer" data-rank="{{ rank }}" 
+                                                      title="{% if rank == 'Trailblossom' %}A quiet contributor on the verge of blossoming into prominence.
+                                                             {% elif rank == 'Trailwhisper' %}A commenter whose subtle words leave a growing impact.
+                                                             {% elif rank == 'Mysterion' %}Inspired by 'mystery' and 'champion,' signifying a conqueror of the unknown.
+                                                             {% elif rank == 'Hintarion' %}A majestic figure in the art of giving hints.
+                                                             {% elif rank == 'Luminarch' %}A ruler in the realm of light and guidance, symbolizing mastery of hints
+                                                             {% elif rank == 'Querysmith' %}A skilled forger of insightful and thought-provoking questions.
+                                                             {% elif rank == 'Cloutcaster' %}A user whose comments cast influence far and wide.
+                                                             {% endif %}">
+                                                    {{ rank }}
+                                                </span>
+                                            {% endfor %}
+                                        {% endif %}
+                                    </div>
+                                {% endif %}
                             </div>
                         </div>
                     </div>
 
-                    <h3 class="card-title text-center mb-3">{{ post.title|default:"(No Title)" }}</h3>
-                    
-                    <!-- Image with post_list styling -->
-                    {% if post.image %}
-                        <div class="image-frame mt-3">
-                            <img src="{{ post.image.url }}" alt="Image for {{ post.content }}" class="img-fluid">
-                        </div>
-                    {% else %}
-                        <p class="text-muted">No image available</p>
-                    {% endif %}
+                    <!-- Replace the content section with this new structure -->
+                    <h3 class="card-title text-center mb-4" style="color: #34414b;">{{ post.title|default:"(No Title)" }}</h3>
 
-                    <!-- Display Tags -->
-                    <div class="mt-3">
-                        <strong>Tags:</strong>
-                        <div class="ms-2 d-inline-block">
+                    <!-- Image and Content row -->
+                    <div class="row mb-4">
+                        <!-- Left side - Image (smaller) -->
+                        <div class="col-md-4">
+                            {% if post.image %}
+                                <div class="image-frame h-100" style="cursor: pointer;" onclick="openImageModal('{{ post.image.url }}')">
+                                    <img src="{{ post.image.url }}" alt="Image for {{ post.content }}" class="img-fluid">
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Right side - Content (wider) -->
+                        <div class="col-md-8">
+                            <div class="text-frame">
+                                <p class="card-text">{{ post.content }}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tags Section below -->
+                    <div class="section-container mb-4">
+                        <h5 style="color: #34414b;">Tags</h5>
+                        <div class="content-box">
                             {% if post.tags.all %}
                                 {% for tag in post.tags.all %}
                                     <a href="https://www.wikidata.org/wiki/{{ tag.wikidata_id }}" 
@@ -101,20 +130,10 @@
                         </div>
                     </div>
 
-                    <!-- Post Content -->
-                    <p class="card-text mt-3">{{ post.content }}</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Middle Column -->
-        <div class="col-4 px-1">
-            <div class="card h-100">
-                <div class="card-body">
-                    <!-- Colors -->
-                    <div class="mb-4">
-                        <strong>Colors:</strong>
-                        <div class="colors-section">
+                    <!-- Colors Section -->
+                    <div class="section-container mb-4">
+                        <h5 style="color: #34414b;">Colors</h5>
+                        <div class="content-box">
                             {% if post.split_colors %}
                                 {% for color in post.split_colors %}
                                     <button type="button" 
@@ -122,7 +141,7 @@
                                             style="background-color: {{ color|lower }}; 
                                                    border: 1px solid #ccc;
                                                    min-width: 80px;
-                                                   color: {% if color|lower == 'white' or color|lower == 'yellow' %}black{% else %}white{% endif %};">
+                                                   color: {% if color|lower == 'white' or color|lower == 'yellow' %}black{% else %}white{% endif %}">
                                         {{ color }}
                                     </button>
                                 {% endfor %}
@@ -132,334 +151,666 @@
                         </div>
                     </div>
 
-                    <!-- Size Information -->
-                    <div class="mb-4">
-                        <strong>Size Information:</strong>
-                        <div class="mt-2">
-                            <div class="d-flex align-items-center mt-2">
-                                <strong class="me-2" style="width: 60px;">Length</strong>
-                                <strong class="me-2" style="width: 40px;">[cm]</strong>
-                                <strong class="me-2" style="width: 10px;">:</strong>
-                                {% if post.length %}
-                                    <button class="btn btn-outline-primary btn-sm" style="width: 100px;">{{ post.length }}</button>
-                                {% else %}
-                                    <span class="text-muted">Not Specified!</span>
-                                {% endif %}
-                            </div>    
-                            <div class="d-flex align-items-center mt-2">
-                                <strong class="me-2" style="width: 60px;">Width</strong>
-                                <strong class="me-2" style="width: 40px;">[cm]</strong>
-                                <strong class="me-2" style="width: 10px;">:</strong>
-                                {% if post.width %}
-                                    <button class="btn btn-outline-primary btn-sm" style="width: 100px;">{{ post.width }}</button>
-                                {% else %}
-                                    <span class="text-muted">Not Specified!</span>
-                                {% endif %}
-                            </div> 
-                            <div class="d-flex align-items-center mt-2">
-                                <strong class="me-2" style="width: 60px;">Height</strong>
-                                <strong class="me-2" style="width: 40px;">[cm]</strong>
-                                <strong class="me-2" style="width: 10px;">:</strong>
-                                {% if post.height %}
-                                    <button class="btn btn-outline-primary btn-sm" style="width: 100px;">{{ post.height }}</button>
-                                {% else %}
-                                    <span class="text-muted">Not Specified!</span>
-                                {% endif %}
-                            </div> 
-                        </div>
-                    </div>
-
-                    <!-- Weight and Price -->
-                    <div class="mb-4">
-                        <div class="d-flex align-items-center mb-3">
-                            <strong class="me-2" style="width: 60px;">Weight</strong>
-                            <strong class="me-2" style="width: 40px;">[g]</strong>
-                            <strong class="me-2" style="width: 10px;">:</strong>
-                            {% if post.weight %}
-                                <button class="btn btn-outline-primary btn-sm" style="width: 100px;">{{ post.weight }}</button>
-                            {% else %}
-                                <span class="text-muted">Not Specified!</span>
-                            {% endif %}
-                        </div>
-
-                        <div class="d-flex align-items-center">
-                            <strong class="me-2" style="width: 60px;">Price</strong>
-                            <strong class="me-2" style="width: 40px;">[$]</strong>
-                            <strong class="me-2" style="width: 10px;">:</strong>
-                            {% if post.price %}
-                                <button class="btn btn-outline-primary btn-sm" style="width: 100px;">{{ post.price|floatformat:2 }}</button>
-                            {% else %}
-                                <span class="text-muted">Not Specified!</span>
-                            {% endif %}
-                        </div>
-                    </div>
-
-                    <!-- Time Period -->
-                    <div class="mb-4">
-                        <strong>Date of the Object:</strong>
-                        <div class="mt-2">
-                            <div class="d-flex align-items-center mt-2">
-                                <strong class="me-2" style="width: 60px;">Era</strong>
-                                <strong class="me-2" style="width: 40px;"></strong>
-                                <strong class="me-2" style="width: 10px;">:</strong>
-                                {% if post.era_display and post.era_display != "Not Specified" %}
-                                    <button class="btn btn-outline-primary btn-sm" style="width: 100px;">{{ post.era_display }}</button>
-                                {% else %}
-                                    <span class="text-muted">Not Specified!</span>
-                                {% endif %}
+                    <!-- Measurements Section -->
+                    <div class="section-container mb-4">
+                        <h5 style="color: #34414b;">Measurements</h5>
+                        <div class="content-box shadow-sm">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="measurement-item">
+                                        <span class="label">Length [cm]:</span>
+                                        <span class="value">{{ post.length|default:"Not Specified!" }}</span>
+                                    </div>
+                                    <div class="measurement-item">
+                                        <span class="label">Width [cm]:</span>
+                                        <span class="value">{{ post.width|default:"Not Specified!" }}</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="measurement-item">
+                                        <span class="label">Height [cm]:</span>
+                                        <span class="value">{{ post.height|default:"Not Specified!" }}</span>
+                                    </div>
+                                    <div class="measurement-item">
+                                        <span class="label">Weight [g]:</span>
+                                        <span class="value">{{ post.weight|default:"Not Specified!" }}</span>
+                                    </div>
+                                </div>
                             </div>
-
-                            <div class="d-flex align-items-center mt-2">
-                                <strong class="me-2" style="width: 60px;">Date</strong>
-                                <strong class="me-2" style="width: 40px;"></strong>
-                                <strong class="me-2" style="width: 10px;">:</strong>
-                                {% if post.time_period_display and post.time_period_display != "Not Specified" %}
-                                    <button class="btn btn-outline-primary btn-sm" style="width: 100px;">{{ post.time_period_display }}</button>
-                                {% else %}
-                                    <span class="text-muted">Not Specified!</span>
-                                {% endif %}
+                            <div class="measurement-item mt-2">
+                                <span class="label">Price [$]:</span>
+                                <span class="value">{{ post.price|floatformat:2|default:"Not Specified!" }}</span>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Materials -->
-                    <div class="mb-4">
-                        <strong>Materials:</strong>
-                        <div class="materials-section">
-                            {% if post.split_materials %}
-                                {% for material in post.split_materials %}
-                                    <button class="btn btn-outline-primary btn-sm m-1">{{ material }}</button>
-                                {% endfor %}
-                            {% else %}
-                                <span class="text-muted">Not Specified!</span>
-                            {% endif %}
+                    <!-- Time Period Section -->
+                    <div class="section-container mb-4">
+                        <h5 style="color: #34414b;">Time Period</h5>
+                        <div class="content-box shadow-sm">
+                            <div class="measurement-item">
+                                <span class="label">Era:</span>
+                                <span class="value">{{ post.era_display|default:"Not Specified!" }}</span>
+                            </div>
+                            <div class="measurement-item">
+                                <span class="label">Date:</span>
+                                <span class="value">{{ post.time_period_display|default:"Not Specified!" }}</span>
+                            </div>
                         </div>
                     </div>
 
-                    <!-- Shapes -->
-                    <div class="mb-4">
-                        <strong>Shapes:</strong>
-                        <div class="shapes-section">
-                            {% if post.get_shapes_list and post.get_shapes_list|first != "[]" %}
-                                {% for shape in post.get_shapes_list %}
-                                    <button class="btn btn-outline-primary btn-sm m-1">{{ shape }}</button>
-                                {% endfor %}
-                            {% else %}
-                                <span class="text-muted">Not Specified!</span>
-                            {% endif %}
+                    <!-- Materials, Shapes, and Textures -->
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="section-container mb-4">
+                                <h5 style="color: #34414b;">Materials</h5>
+                                <div class="content-box shadow-sm">
+                                    {% if post.split_materials %}
+                                        {% for material in post.split_materials %}
+                                            <button class="btn btn-outline-primary btn-sm m-1">{{ material }}</button>
+                                        {% endfor %}
+                                    {% else %}
+                                        <span class="text-muted">Not Specified!</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="section-container mb-4">
+                                <h5 style="color: #34414b;">Shapes</h5>
+                                <div class="content-box shadow-sm">
+                                    {% if post.get_shapes_list and post.get_shapes_list|first != "[]" %}
+                                        {% for shape in post.get_shapes_list %}
+                                            <button class="btn btn-outline-primary btn-sm m-1">{{ shape }}</button>
+                                        {% endfor %}
+                                    {% else %}
+                                        <span class="text-muted">Not Specified!</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="section-container mb-4">
+                                <h5 style="color: #34414b;">Textures</h5>
+                                <div class="content-box shadow-sm">
+                                    {% if post.split_textures and post.split_textures|first != "[]" %}
+                                        {% for texture in post.split_textures %}
+                                            <button class="btn btn-outline-primary btn-sm m-1">{{ texture }}</button>
+                                        {% endfor %}
+                                    {% else %}
+                                        <span class="text-muted">Not Specified!</span>
+                                    {% endif %}
+                                </div>
+                            </div>
                         </div>
                     </div>
 
-                    <!-- Textures -->
-                    <div class="mb-4">
-                        <strong>Textures:</strong>
-                        <div class="textures-section">
-                            {% if post.split_textures and post.split_textures|first != "[]" %}
-                                {% for texture in post.split_textures %}
-                                    <button class="btn btn-outline-primary btn-sm m-1">{{ texture }}</button>
-                                {% endfor %}
-                            {% else %}
-                                <span class="text-muted">Not Specified!</span>
-                            {% endif %}
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Right Column -->
-        <div class="col-4 px-1">
-            <div class="card h-100 d-flex flex-column">
-                <div class="card-body flex-grow-1">
-                    <h5 class="mb-3">Comments</h5>
                     <!-- Comments Section -->
-                    {% for comment in post.comments.all %}
-                        <div class="comment-box mb-3">
-                            <div class="d-flex align-items-start">
-                                <strong class="me-2">{{ comment.get_username }}</strong>
-                                <p class="mb-1">{{ comment.content }}</p>
+                    <div class="section-container">
+                        <div class="row mb-4">
+                            <!-- Winner Comment -->
+                            <div class="col-12">
+                                <h5 style="color: #34414b;">Winner!</h5>
+                                <div class="comments-box {% if post.status == 'solved' %}winner-box-solved{% else %}winner-box{% endif %}">
+                                    {% if post.status == 'solved' and post.winner_comment %}
+                                        <div class="comment-box winner-comment">
+                                            <div class="d-flex align-items-start">
+                                                <!-- Profile Picture -->
+                                                <div class="me-2">
+                                                    {% if post.winner_comment.is_anonymous %}
+                                                        <div class="anonymous-avatar">
+                                                            <i class="fas fa-user"></i>
+                                                        </div>
+                                                    {% else %}
+                                                        {% if post.winner_comment.user %}
+                                                            <a href="{% url 'user_profile' post.winner_comment.user.username %}">
+                                                                {% if post.winner_comment.user.profile.profile_picture %}
+                                                                    <img src="{{ post.winner_comment.user.profile.profile_picture.url }}" 
+                                                                         alt="Profile picture" 
+                                                                         class="rounded-circle"
+                                                                         style="width: 30px; height: 30px; object-fit: cover;">
+                                                                {% else %}
+                                                                    <img src="{% static 'images/default_profile.png' %}" 
+                                                                         alt="Default profile picture" 
+                                                                         class="rounded-circle"
+                                                                         style="width: 30px; height: 30px; object-fit: cover;">
+                                                                {% endif %}
+                                                            </a>
+                                                        {% else %}
+                                                            <div class="deleted-user-pic-placeholder rounded-circle"
+                                                                 style="width: 30px; height: 30px; background-color: #ccc;"></div>
+                                                        {% endif %}
+                                                    {% endif %}
+                                                </div>
+                                                <!-- Winner Comment Content -->
+                                                <div class="d-flex justify-content-between align-items-start w-100">
+                                                    <div class="flex-grow-1">
+                                                        {% include "posts/comment_content.html" with comment=post.winner_comment hide_registration_type=True %}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {% else %}
+                                        <p class="text-center text-muted my-3">Mystery is not solved yet!</p>
+                                    {% endif %}
+                                </div>
                             </div>
-                            <small class="text-muted">{{ comment.created_at }}</small>
                         </div>
-                    {% empty %}
-                        <p>No comments yet.</p>
-                    {% endfor %}
 
-                    <!-- Comment Form -->
-                    <form action="{% url 'posts:add_comment' post.id %}" method="post" class="mt-3">
-                        {% csrf_token %}
-                        <textarea name="content" rows="2" maxlength="500" 
-                                  placeholder="Add a comment..." required 
-                                  class="form-control mb-2"></textarea>
-                        <button type="submit" class="btn btn-secondary">Comment</button>
-                    </form>
+                        <div class="row">
+                            <!-- Recent Comments -->
+                            <div class="col-md-6">
+                                <h5>Recent Comments</h5>
+                                <div class="comments-box">
+                                    {% for comment in post.comments.all|dictsortreversed:"created_at" %}
+                                        <div class="comment-box">
+                                            <div class="d-flex align-items-start">
+                                                <!-- Profile Picture -->
+                                                <div class="me-2">
+                                                    {% if comment.is_anonymous %}
+                                                        <div class="anonymous-avatar">
+                                                            <i class="fas fa-user"></i>
+                                                        </div>
+                                                    {% else %}
+                                                        {% if comment.user %}
+                                                            <a href="{% url 'user_profile' comment.user.username %}">
+                                                                {% if comment.user.profile.profile_picture %}
+                                                                    <img src="{{ comment.user.profile.profile_picture.url }}" 
+                                                                         alt="Profile picture" 
+                                                                         class="rounded-circle"
+                                                                         style="width: 30px; height: 30px; object-fit: cover;">
+                                                                {% else %}
+                                                                    <img src="{% static 'images/default_profile.png' %}" 
+                                                                         alt="Default profile picture" 
+                                                                         class="rounded-circle"
+                                                                         style="width: 30px; height: 30px; object-fit: cover;">
+                                                                {% endif %}
+                                                            </a>
+                                                        {% else %}
+                                                            <div class="deleted-user-pic-placeholder rounded-circle"
+                                                                 style="width: 30px; height: 30px; background-color: #ccc;"></div>
+                                                        {% endif %}
+                                                    {% endif %}
+                                                </div>
+                                                <!-- Comment Content -->
+                                                <div class="d-flex justify-content-between align-items-start w-100">
+                                                    <div class="flex-grow-1">
+                                                        {% include "posts/comment_content.html" with comment=comment hide_registration_type=True %}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {% empty %}
+                                        <p>No comments yet.</p>
+                                    {% endfor %}
+                                </div>
+                            </div>
+
+                            <!-- Top Voted Comments -->
+                            <div class="col-md-6">
+                                <h5>Top Voted Comments</h5>
+                                <div class="comments-box">
+                                    {% for comment in post.comments.all|dictsort:"vote_score" reversed %}
+                                        {% if comment.vote_score > 0 %}
+                                            <div class="comment-box">
+                                                <div class="d-flex align-items-start">
+                                                    <!-- Profile Picture -->
+                                                    <div class="me-2">
+                                                        {% if comment.is_anonymous %}
+                                                            <div class="anonymous-avatar">
+                                                                <i class="fas fa-user"></i>
+                                                            </div>
+                                                        {% else %}
+                                                            {% if comment.user %}
+                                                                <a href="{% url 'user_profile' comment.user.username %}">
+                                                                    {% if comment.user.profile.profile_picture %}
+                                                                        <img src="{{ comment.user.profile.profile_picture.url }}" 
+                                                                             alt="Profile picture" 
+                                                                             class="rounded-circle"
+                                                                             style="width: 30px; height: 30px; object-fit: cover;">
+                                                                    {% else %}
+                                                                        <img src="{% static 'images/default_profile.png' %}" 
+                                                                             alt="Default profile picture" 
+                                                                             class="rounded-circle"
+                                                                             style="width: 30px; height: 30px; object-fit: cover;">
+                                                                    {% endif %}
+                                                                </a>
+                                                            {% else %}
+                                                                <div class="deleted-user-pic-placeholder rounded-circle"
+                                                                     style="width: 30px; height: 30px; background-color: #ccc;"></div>
+                                                            {% endif %}
+                                                        {% endif %}
+                                                    </div>
+                                                    <!-- Top Voted Comment Content -->
+                                                    <div class="d-flex justify-content-between align-items-start w-100">
+                                                        <div class="flex-grow-1">
+                                                            {% include "posts/comment_content.html" with comment=comment hide_registration_type=True %}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        {% endif %}
+                                    {% empty %}
+                                        <p>No top voted comments yet.</p>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Comment Form -->
+                        <form action="{% url 'posts:add_comment' post.id %}" method="post" class="mt-3" id="commentForm">
+                            {% csrf_token %}
+                            <div class="mb-3">
+                                <div class="d-flex gap-3 mb-2">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="comment_type" 
+                                               id="typeQuestion" value="question" required>
+                                        <label class="form-check-label" for="typeQuestion">
+                                            Question
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="comment_type" 
+                                               id="typeAnswer" value="answer">
+                                        <label class="form-check-label" for="typeAnswer">
+                                            Answer
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="comment_type" 
+                                               id="typeHint" value="hint">
+                                        <label class="form-check-label" for="typeHint">
+                                            Hint
+                                        </label>
+                                    </div>
+                                </div>
+                                
+                                <div id="wikidataLinkGroup" class="mb-2 d-none">
+                                    <input type="url" class="form-control mb-2" id="wikidataLink" 
+                                           name="wikidata_link" placeholder="Enter Wikidata URL (e.g., https://www.wikidata.org/wiki/Q...)">
+                                    <div class="invalid-feedback">
+                                        Please enter a valid Wikidata URL (e.g., https://www.wikidata.org/wiki/Q...)
+                                    </div>
+                                    <input type="url" class="form-control" id="hintLink" 
+                                           name="hint_link" placeholder="Enter a web link to support your hint">
+                                    <div class="invalid-feedback">
+                                        Please enter a valid URL
+                                    </div>
+                                    <small class="text-muted">At least one link is required for hints</small>
+                                </div>
+
+                                <div id="answerLinkGroup" class="mb-2 d-none">
+                                    <input type="url" class="form-control" id="answerLink" 
+                                           name="answer_link" placeholder="Enter a web link to support your answer">
+                                    <div class="invalid-feedback">
+                                        Please enter a valid URL (e.g., https://www.example.com)
+                                    </div>
+                                </div>
+
+                                <textarea name="content" rows="2" maxlength="500" 
+                                         placeholder="Add a comment..." required 
+                                         class="form-control mb-2"></textarea>
+                                <div class="d-flex justify-content-end align-items-center">
+                                    <div class="form-check form-switch me-3">
+                                        <input class="form-check-input" type="checkbox" 
+                                               id="anonymousSwitch" name="is_anonymous"
+                                               onchange="updateSwitchLabel(this)">
+                                        <label class="form-check-label" for="anonymousSwitch" id="anonymousSwitchLabel" style="width: 170px;">
+                                            Named Comment
+                                        </label>
+                                    </div>
+                                    <button type="submit" class="btn btn-secondary">Comment</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Custom CSS -->
+<!-- Image Modal -->
+<div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="imageModalLabel">Image Preview</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center">
+                <img id="modalImage" src="" alt="Full size image" style="max-width: 100%; height: auto;">
+            </div>
+        </div>
+    </div>
+</div>
+
 <style>
-    .image-frame {
-        width: 100%;
-        height: 320px;
-        overflow: hidden;
-        position: relative;
-        background-color: #f0f0f0;
-        margin: 0 auto;
-        border-radius: 15px;
-        padding: 5px;
+    .section-container {
+        margin-bottom: 2rem;
+    }
+
+    .content-box {
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        padding: 1rem;
+        margin-top: 0.5rem;
+    }
+
+    .comments-box {
+        max-height: 400px;
+        overflow-y: auto;
+    }
+
+    .measurement-item {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 0.5rem;
+    }
+
+    .measurement-item .label {
+        font-weight: bold;
+        color: #495057;
+    }
+
+    .image-frame, .text-frame {
+        height: 450px;
+        border-radius: 8px;
         border: 2px solid #34414b;
+        background-color: #f8f9fa;
+        padding: 15px;
+        margin: 0;
+    }
+
+    .image-frame {
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 
     .image-frame img {
-        width: calc(100% - 10px);
-        height: calc(100% - 10px);
+        max-width: 100%;
+        max-height: 420px;
         object-fit: contain;
-        object-position: center;
-        border-radius: 12px;
-        margin: 5px;
-        border: 1px solid #f0f0f0;
     }
 
-    .card {
-        height: 100%;
-        min-height: 800px;
-        border: 2px solid #34414b;
-        border-radius: .25rem;
+    .text-frame {
+        overflow-y: auto;
+    }
+
+    .text-frame .card-text {
+        margin: 0;
     }
 
     .comment-box {
-        padding: 10px;
-        border-bottom: 1px solid #eee;
+        padding: 1rem;
+        border-bottom: 1px solid #dee2e6;
     }
 
     .comment-box:last-child {
         border-bottom: none;
     }
 
-    /* Update column spacing styles */
-    .row {
-        margin: 0 !important;
-        width: 100% !important;
-    }
-    
-    .col-4 {
-        flex: 0 0 33.333333%;
-        max-width: 33.333333%;
-        padding: 0 1px;
-    }
-
     .container-fluid {
-        padding-left: 2px !important;
-        padding-right: 2px !important;
-        max-width: 100% !important;
+        padding-left: 50px !important;
+        padding-right: 50px !important;
+        max-width: 1800px !important;
+        margin: 0 auto !important;
+        display: flex;
+        justify-content: center;
     }
 
-    /* Add padding to the bottom of the page */
-    #content {
-        padding-bottom: 50px;
+    .container-fluid > .row {
+        width: 100%;
+        max-width: 1800px;
+        margin: 0 auto;
     }
 
-    /* Fixed height sections */
-    .colors-section,
-    .materials-section,
-    .shapes-section,
-    .textures-section {
-        min-height: 200px;
-        height: auto;
-        overflow-y: auto;
-        padding: 10px;
-        border: 1px solid white;
-        border-radius: 4px;
-        margin-top: 10px;
-        background-color: white;
+    .card {
+        margin-bottom: 30px;
+        width: 100%;
+        margin-left: auto;
+        margin-right: auto;
+        border: 2px solid #34414b;
+        border-radius: 5px;
     }
 
-    /* Update button styling */
-    .materials-section .btn,
-    .shapes-section .btn,
-    .textures-section .btn {
-        min-height: 20px;
+    .card-body {
+        border-left: 2px solid #34414b;
+        border-right: 2px solid #34414b;
+    }
+
+    .modal-xl {
+        max-width: 90vw;
+    }
+
+    .modal-body {
+        padding: 0;
+        background-color: #f8f9fa;
+    }
+
+    .modal-body img {
+        display: block;
+        margin: 0 auto;
+        max-height: 85vh;
+        object-fit: contain;
+    }
+
+    .image-frame:hover {
+        opacity: 0.9;
+        transition: opacity 0.2s ease-in-out;
+    }
+
+    .voting-controls {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 8px;
+    }
+
+    .vote-group {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .select-winner-btn {
+        font-size: 0.8rem;
+        padding: 2px 8px;
         white-space: nowrap;
-        padding-left: 12px;
-        padding-right: 12px;
-        margin: 5px;
+        min-width: 120px;
+        text-align: center;
     }
 
-    /* Status Switch Styling */
-    .status-switch-container {
-        position: absolute;
-        top: 10px;
-        right: 10px;
-        z-index: 1;
+    .vote-btn {
+        padding: 2px 5px;
+        color: #6c757d;
+        background: none;
+        border: none;
+        display: flex;
+        align-items: center;
+        gap: 3px;
     }
 
-    .form-check-input {
-        width: 3em;
-        height: 1.5em;
-        cursor: pointer;
+    .vote-count {
+        font-size: 0.8rem;
+        font-weight: bold;
     }
 
-    .form-check-input:checked {
-        background-color: #198754;
-        border-color: #198754;
+    .vote-count.upvotes {
+        color: #28a745;
     }
 
-    .deleted-username {
-        color: #ff6b6b;
+    .vote-count.downvotes {
+        color: #dc3545;
+    }
+
+    .vote-btn.active {
+        color: inherit;
+    }
+
+    .vote-btn.active[onclick*="up"] {
+        color: #28a745;
+    }
+
+    .vote-btn.active[onclick*="down"] {
+        color: #dc3545;
+    }
+
+    .vote-btn:hover {
+        opacity: 0.8;
+    }
+
+    .vote-btn:disabled {
         opacity: 0.5;
+        cursor: not-allowed;
     }
 
-    .deleted-user-pic-container {
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        border: 2px solid #ff6b6b;
-        overflow: hidden;
+    .winner-box {
+        background-color: #fff3cd;  /* Light yellow background */
+        border: 2px solid #ffeeba;
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        min-height: 100px;  /* Ensure minimum height even when empty */
         display: flex;
         align-items: center;
         justify-content: center;
     }
 
-    .deleted-user-pic-placeholder {
-        width: 100%;
-        height: 100%;
+    .winner-box p {
+        font-size: 1.1rem;
+        color: #856404;
+    }
+
+    .winner-box-solved {
+        background-color: #d4edda;  /* Light green background */
+        border: 2px solid #c3e6cb;
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        min-height: 100px;
+    }
+
+    .select-winner-btn {
+        font-size: 0.8rem;
+        padding: 2px 8px;
+    }
+
+    .winner-comment {
+        background-color: white;
+        border-radius: 6px;
+        margin: 0;
+    }
+
+    .form-check-input:checked {
+        background-color: #6c757d;
+        border-color: #6c757d;
+    }
+    
+    .form-check-input:focus {
+        border-color: #6c757d;
+        box-shadow: 0 0 0 0.25rem rgba(108, 117, 125, 0.25);
+    }
+
+    .form-check-label {
+        transition: all 0.2s ease-in-out;
+    }
+
+    .anonymous-avatar {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
         background-color: #e9ecef;
-        opacity: 0.7;
+        border: 1px solid #dee2e6;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 
-    .profile-pic {
-        border: 2px solid #34414b;
+    .anonymous-avatar i {
+        color: #adb5bd;
+        font-size: 16px;
     }
 
-    .admin-controls .btn-danger {
-        background-color: #dc3545;
-        border-color: #dc3545;
-        color: white;
-        padding: 8px 15px;
-        font-size: 1rem;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    .form-check-input[type="radio"]:checked {
+        background-color: #6c757d;
+        border-color: #6c757d;
     }
 
-    .admin-controls .btn-danger:hover {
-        background-color: #c82333;
-        border-color: #bd2130;
-        box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+    #wikidataLinkGroup {
+        transition: all 0.3s ease-in-out;
     }
 
-    .admin-controls .fas {
-        margin-right: 5px;
+    .user-ranks {
+        margin-top: 0.15rem;
+        display: flex;
+        gap: 0.25rem;
+        flex-wrap: wrap;
+        align-items: center;
     }
 
-    .position-absolute {
-        z-index: 1000;
+    .badge-mysteries-slayer[data-rank="Mysteries Slayer"] {
+        background-color: #006699 !important;
+    }
+
+    .badge-mysteries-slayer[data-rank="Master of Hints"] {
+        background-color: #33CCCC !important;
+    }
+
+    .badge-mysteries-slayer[data-rank="Questioner"] {
+        background-color: #CC99FF !important;
+    }
+
+    .badge-mysteries-slayer[data-rank="Best Respondent"] {
+        background-color: #00CC99 !important;
+    }
+
+    .badge-mysteries-slayer[data-rank="Popular"] {
+        background-color: #0066FF !important;
+    }
+
+    .badge-mysteries-slayer[data-rank="Mystery Bringer"] {
+        background-color: #CC0099 !important;
+    }
+
+    .badge-mysteries-slayer[data-rank="Beginner"] {
+        background-color: #F69200 !important;
+    }
+
+    .badge-mysteries-slayer[data-rank="Moderate"] {
+        background-color: #FF5050 !important;
+    }
+
+    .badge-mysteries-slayer[data-rank="Trailwhisper"] {
+        background-color: #FF5050 !important;
+    }
+
+    .badge-mysteries-slayer[data-rank="Hintarion"] {
+        background-color: #33CCCC !important;
+    }
+
+    .badge-mysteries-slayer[data-rank="Luminarch"] {
+        background-color: #00CC99 !important;
+    }
+
+    .badge-mysteries-slayer[data-rank="Querysmith"] {
+        background-color: #CC99FF !important;
+    }
+
+    .badge-mysteries-slayer[data-rank="Cloutcaster"] {
+        background-color: #0066FF !important;
+    }
+
+    .badge-mysteries-slayer[data-rank="Riddlecaster"] {
+        background-color: #CC0099 !important;
     }
 </style>
 
 <!-- Add JavaScript for switch functionality -->
 <script>
+let selectedWinnerId = null;
+
 document.addEventListener('DOMContentLoaded', function() {
     const statusSwitch = document.getElementById('statusSwitch');
     const statusLabel = document.getElementById('statusLabel');
@@ -471,50 +822,99 @@ document.addEventListener('DOMContentLoaded', function() {
         statusSwitch.addEventListener('change', function() {
             const postId = this.dataset.postId;
             const newStatus = this.checked ? 'solved' : 'unsolved';
-            console.log('Attempting to update status:', newStatus); // Debug log
 
-            // Update label text
-            statusLabel.textContent = this.checked ? 'Solved' : 'Unsolved';
+            if (newStatus === 'solved') {
+                // Prevent immediate switch
+                this.checked = false;
+                
+                // Show comment selection modal
+                const modal = new bootstrap.Modal(document.getElementById('selectWinnerModal'));
+                modal.show();
+                return;
+            }
 
-            // Send AJAX request to update status
-            fetch(`/posts/api/update-status/${postId}/`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
-                },
-                body: JSON.stringify({
-                    status: newStatus
-                })
-            })
-            .then(response => {
-                console.log('Response status:', response.status); // Debug log
-                return response.json().then(data => {
-                    if (!response.ok) {
-                        throw new Error(data.error || 'Failed to update status');
-                    }
-                    return data;
-                });
-            })
-            .then(data => {
-                console.log('Success:', data); // Debug log
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                // Revert switch if update failed
-                this.checked = !this.checked;
-                statusLabel.textContent = this.checked ? 'Solved' : 'Unsolved';
-                alert(error.message || 'An error occurred while updating status');
-            });
+            updatePostStatus(postId, newStatus);
         });
     }
 });
+
+function selectWinnerAndSolve(commentId) {
+    if (confirm('Are you sure you want to select this comment as the winner? This will mark the post as solved.')) {
+        const postId = document.getElementById('statusSwitch').dataset.postId;
+        
+        // Close modal if it exists
+        const modal = bootstrap.Modal.getInstance(document.getElementById('selectWinnerModal'));
+        if (modal) {
+            modal.hide();
+        }
+        
+        // Update status with winner
+        fetch("{% url 'posts:update_post_status' 0 %}".replace('0', postId), {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                status: 'solved',
+                winner_comment_id: commentId
+            })
+        })
+        .then(response => {
+            if (!response.ok) {
+                if (response.status === 403) {
+                    throw new Error('You are not authorized to perform this action');
+                }
+                return response.text().then(text => {
+                    console.error('Server response:', text);
+                    throw new Error('Server error occurred');
+                });
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.success) {
+                // Update the switch state and reload the page
+                const statusSwitch = document.getElementById('statusSwitch');
+                if (statusSwitch) {
+                    statusSwitch.checked = true;
+                }
+                location.reload();
+            } else {
+                alert(data.error || 'Failed to update status');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert(error.message || 'An error occurred while updating status');
+        });
+    }
+}
+
+function updatePostStatus(postId, newStatus) {
+    fetch("{% url 'posts:update_post_status' 0 %}".replace('0', postId), {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}',
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            status: newStatus
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            location.reload();
+        }
+    });
+}
 
 function deletePost(postId) {
     if (confirm('Are you sure you want to delete this post? This action cannot be undone!')) {
         const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
         
-        fetch(`/posts/api/delete-post/${postId}/`, {
+        fetch("{% url 'posts:delete_post' 0 %}".replace('0', postId), {
             method: 'DELETE',
             headers: {
                 'X-CSRFToken': csrfToken
@@ -529,7 +929,7 @@ function deletePost(postId) {
         })
         .then(data => {
             if (data.success) {
-                window.location.href = '/posts/';  // Redirect to posts list after successful deletion
+                window.location.href = '/';  // Redirect to home after successful deletion
             } else {
                 alert(data.error || 'Error deleting post');
             }
@@ -540,7 +940,264 @@ function deletePost(postId) {
         });
     }
 }
+
+function openImageModal(imageUrl) {
+    const modal = new bootstrap.Modal(document.getElementById('imageModal'));
+    document.getElementById('modalImage').src = imageUrl;
+    modal.show();
+}
+
+function voteComment(commentId, voteType) {
+    fetch("{% url 'posts:vote_comment' 0 'up' %}".replace('0', commentId).replace('up', voteType), {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Update vote counts for all instances of this comment
+            document.querySelectorAll(`#upvotes-${commentId}`).forEach(element => {
+                element.textContent = data.upvotes_count;
+            });
+            document.querySelectorAll(`#downvotes-${commentId}`).forEach(element => {
+                element.textContent = data.downvotes_count;
+            });
+            
+            // Update button states for all instances of this comment
+            document.querySelectorAll(`button[onclick="voteComment(${commentId}, 'up')"]`).forEach(button => {
+                button.classList.remove('active');
+                if (data.user_vote === 'up') {
+                    button.classList.add('active');
+                }
+            });
+            
+            document.querySelectorAll(`button[onclick="voteComment(${commentId}, 'down')"]`).forEach(button => {
+                button.classList.remove('active');
+                if (data.user_vote === 'down') {
+                    button.classList.add('active');
+                }
+            });
+
+            // If the vote score has changed, reload the page to update the Top Voted Comments section
+            if (data.vote_score_changed) {
+                location.reload();
+            }
+        } else {
+            alert(data.error || 'An error occurred while voting');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred while voting');
+    });
+}
+
+function updateSwitchLabel(switchElement) {
+    const label = document.getElementById('anonymousSwitchLabel');
+    if (switchElement.checked) {
+        label.textContent = 'Anonymous Comment';
+    } else {
+        label.textContent = 'Named Comment';
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    const commentForm = document.getElementById('commentForm');
+    const wikidataLinkGroup = document.getElementById('wikidataLinkGroup');
+    const answerLinkGroup = document.getElementById('answerLinkGroup');
+    const wikidataLink = document.getElementById('wikidataLink');
+    const hintLink = document.getElementById('hintLink');
+    const answerLink = document.getElementById('answerLink');
+    const typeHint = document.getElementById('typeHint');
+    const typeAnswer = document.getElementById('typeAnswer');
+    
+    // Initialize status switch
+    const statusSwitch = document.getElementById('statusSwitch');
+    const statusLabel = document.getElementById('statusLabel');
+    if (statusSwitch) {
+        statusLabel.textContent = statusSwitch.checked ? 'Solved' : 'Unsolved';
+    }
+
+    // Show/hide appropriate link fields based on comment type
+    document.querySelectorAll('input[name="comment_type"]').forEach(radio => {
+        radio.addEventListener('change', function() {
+            if (this.value === 'hint') {
+                wikidataLinkGroup.classList.remove('d-none');
+                answerLinkGroup.classList.add('d-none');
+                wikidataLink.required = false;  // Changed to false since either link is acceptable
+                hintLink.required = false;      // Changed to false since either link is acceptable
+                answerLink.required = false;
+            } else if (this.value === 'answer') {
+                answerLinkGroup.classList.remove('d-none');
+                wikidataLinkGroup.classList.add('d-none');
+                answerLink.required = true;
+                wikidataLink.required = false;
+                hintLink.required = false;
+            } else {
+                wikidataLinkGroup.classList.add('d-none');
+                answerLinkGroup.classList.add('d-none');
+                wikidataLink.required = false;
+                hintLink.required = false;
+                answerLink.required = false;
+            }
+        });
+    });
+
+    // Validate form submission
+    commentForm.addEventListener('submit', function(e) {
+        if (typeHint.checked) {
+            const wikidataUrl = wikidataLink.value;
+            const hintUrl = hintLink.value;
+            const wikidataPattern = /^https:\/\/www\.wikidata\.org\/wiki\/Q\d+$/;
+            
+            // For hints, require at least one valid URL
+            if (!wikidataUrl && !hintUrl) {
+                e.preventDefault();
+                wikidataLink.classList.add('is-invalid');
+                hintLink.classList.add('is-invalid');
+                return false;
+            }
+
+            // If Wikidata URL is provided, validate its format
+            if (wikidataUrl && !wikidataPattern.test(wikidataUrl)) {
+                e.preventDefault();
+                wikidataLink.classList.add('is-invalid');
+                return false;
+            }
+
+            // If hint URL is provided, validate it's a proper URL
+            if (hintUrl) {
+                try {
+                    new URL(hintUrl);
+                } catch (error) {
+                    e.preventDefault();
+                    hintLink.classList.add('is-invalid');
+                    return false;
+                }
+            }
+        } else if (typeAnswer.checked) {
+            const answerUrl = answerLink.value;
+            try {
+                new URL(answerUrl);
+            } catch (error) {
+                e.preventDefault();
+                answerLink.classList.add('is-invalid');
+                return false;
+            }
+        }
+    });
+
+    // Remove invalid class when user starts typing
+    wikidataLink.addEventListener('input', function() {
+        this.classList.remove('is-invalid');
+    });
+
+    hintLink.addEventListener('input', function() {
+        this.classList.remove('is-invalid');
+    });
+
+    answerLink.addEventListener('input', function() {
+        this.classList.remove('is-invalid');
+    });
+});
+
+// Add this JavaScript function for comment deletion
+function deleteComment(commentId) {
+    if (confirm('Are you sure you want to delete this comment? This action cannot be undone!')) {
+        fetch(`{% url 'posts:delete_comment' 999 %}`.replace('999', commentId), {
+            method: 'DELETE',
+            headers: {
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => {
+            if (!response.ok) {
+                return response.json().then(data => Promise.reject(data.error || 'Error deleting comment'));
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.success) {
+                location.reload();  // Reload the page to reflect the deletion
+            } else {
+                alert(data.error || 'Error deleting comment');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred while deleting the comment');
+        });
+    }
+}
 </script>
+
+<!-- Add this modal to your HTML -->
+<div class="modal fade" id="selectWinnerModal" tabindex="-1" aria-labelledby="selectWinnerModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="selectWinnerModalLabel">Select Winning Comment</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="comments-list">
+                    {% for comment in post.comments.all %}
+                        {% if comment.user != post.user and comment.comment_type != 'question' %}
+                            <div class="comment-item p-3 border-bottom">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <strong>{{ comment.get_username }}</strong>
+                                        <p class="mb-1">{{ comment.content }}</p>
+                                        <small class="text-muted">{{ comment.created_at }}</small>
+                                        <span class="badge {% if comment.comment_type == 'answer' %}badge-answer{% else %}badge-hint{% endif %} me-2">
+                                            {{ comment.get_comment_type_display }}
+                                        </span>
+                                    </div>
+                                    <button class="btn btn-success btn-sm" 
+                                            onclick="selectWinnerAndSolve({{ comment.id }})"
+                                            {% if comment.user == post.user %}disabled{% endif %}
+                                            {% if comment.user == post.user %}title="You cannot select your own comment as winner"{% endif %}>
+                                        Select as Winner
+                                    </button>
+                                </div>
+                            </div>
+                        {% endif %}
+                    {% empty %}
+                        <p class="text-center">No comments available</p>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add these styles -->
+<style>
+    .comments-list {
+        max-height: 400px;
+        overflow-y: auto;
+    }
+
+    .comment-item {
+        background-color: #fff;
+        transition: background-color 0.2s;
+    }
+
+    .comment-item:hover {
+        background-color: #f8f9fa;
+    }
+
+    .comment-item:last-child {
+        border-bottom: none !important;
+    }
+</style>
 
 <!-- Add this at the bottom of the page, after the container -->
 <div style="height: 50px;"></div>

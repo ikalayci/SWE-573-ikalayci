@@ -1170,6 +1170,96 @@
         document.querySelector(`input[name="min_${type}"]`).value = '';
         document.querySelector(`input[name="max_${type}"]`).value = '';
     }
+
+    // Rank explanations object
+    const rankExplanations = {
+        'Trailblossom': 'A quiet contributor on the verge of blossoming into prominence.',
+        'Trailwhisper': 'A commenter whose subtle words leave a growing impact.',
+        'Mysterion': 'Inspired by "mystery" and "champion," signifying a conqueror of the unknown.',
+        'Hintarion': 'A majestic figure in the art of giving hints.',
+        'Luminarch': 'A ruler in the realm of light and guidance, symbolizing mastery of hints.',
+        'Querysmith': 'A skilled forger of insightful and thought-provoking questions.',
+        'Cloutcaster': 'A user whose comments cast influence far and wide.',
+        'Riddlecaster': 'A master of creating engaging and challenging mysteries.'
+    };
+
+    // Function to create and position tooltip
+    function showTooltip(element, text) {
+        let tooltip = document.createElement('div');
+        tooltip.className = 'rank-tooltip';
+        tooltip.textContent = text;
+        
+        // Style the tooltip
+        tooltip.style.position = 'absolute';
+        tooltip.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
+        tooltip.style.color = 'white';
+        tooltip.style.padding = '8px 12px';
+        tooltip.style.borderRadius = '4px';
+        tooltip.style.fontSize = '14px';
+        tooltip.style.zIndex = '1000';
+        tooltip.style.maxWidth = '250px';
+        tooltip.style.boxShadow = '0 2px 4px rgba(0,0,0,0.2)';
+        
+        document.body.appendChild(tooltip);
+        
+        // Position the tooltip above the rank badge
+        const rect = element.getBoundingClientRect();
+        const tooltipRect = tooltip.getBoundingClientRect();
+        
+        tooltip.style.left = rect.left + (rect.width - tooltipRect.width) / 2 + 'px';
+        tooltip.style.top = rect.top - tooltipRect.height - 8 + 'px';
+        
+        return tooltip;
+    }
+
+    // Add event listeners to all rank badges
+    document.addEventListener('DOMContentLoaded', function() {
+        let currentTooltip = null;
+        
+        // Function to handle mouseenter
+        function handleMouseEnter(event) {
+            const badge = event.target;
+            const rank = badge.textContent.trim();
+            const explanation = rankExplanations[rank];
+            
+            if (explanation) {
+                currentTooltip = showTooltip(badge, explanation);
+            }
+        }
+        
+        // Function to handle mouseleave
+        function handleMouseLeave() {
+            if (currentTooltip) {
+                currentTooltip.remove();
+                currentTooltip = null;
+            }
+        }
+        
+        // Add event listeners to existing badges
+        function addBadgeListeners() {
+            document.querySelectorAll('.badge-mysteries-slayer').forEach(badge => {
+                badge.addEventListener('mouseenter', handleMouseEnter);
+                badge.addEventListener('mouseleave', handleMouseLeave);
+            });
+        }
+        
+        // Initial setup
+        addBadgeListeners();
+        
+        // Optional: Setup a MutationObserver to handle dynamically added badges
+        const observer = new MutationObserver(function(mutations) {
+            mutations.forEach(function(mutation) {
+                if (mutation.addedNodes.length) {
+                    addBadgeListeners();
+                }
+            });
+        });
+        
+        observer.observe(document.body, {
+            childList: true,
+            subtree: true
+        });
+    });
     </script>
 </body>
 </html>
