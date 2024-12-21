@@ -557,6 +557,47 @@
         .categorized-input-container {
             width: 90% !important;
         }
+
+        /* Add these styles for field suggestions */
+        .field-suggestions {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            z-index: 1100;
+            background-color: #5d7082;
+            border: 1px solid #34414b;
+            border-radius: 4px;
+            box-shadow: 0 6px 12px rgba(0,0,0,.3);
+            padding: 8px 0;
+            margin-top: 4px;
+            max-height: 200px;
+            overflow-y: auto;
+            display: none;
+        }
+
+        .field-suggestions .suggestion-item {
+            padding: 8px 16px;
+            cursor: pointer;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-height: 32px;
+        }
+
+        .field-suggestions .suggestion-item:hover {
+            background-color: #6d8092;
+        }
+
+        .categorized-input-container {
+            position: relative;
+        }
+
+        /* Ensure the suggestions appear above other elements */
+        .advanced-search-panel .field-suggestions {
+            z-index: 1200;
+        }
     </style>
 </head>
 <body>
@@ -618,7 +659,7 @@
                         {% endif %}
                         <span class="navbar-text text-white" style="font-size: 14px;">Welcome, {{ user.username }}!</span>
                     </div>
-                    <a href="{% url 'profile' %}" class="btn btn-outline-light me-2" style="height: 38px; padding: 6px 12px; font-size: 14px;">Profile</a>
+                    <a href="{% url 'user_profile' user.username %}" class="btn btn-outline-light me-2" style="height: 38px; padding: 6px 12px; font-size: 14px;">Profile</a>
                     <a href="{% url 'logout' %}" class="btn btn-outline-danger" style="height: 38px; padding: 6px 12px; font-size: 14px;">Logout</a>
                 {% else %}
                     <a href="{% url 'login' %}" class="btn btn-outline-light me-2" style="height: 38px; padding: 6px 12px; font-size: 14px;">Login</a>
@@ -817,9 +858,12 @@
                                     <span class="suggestion-category">${item.category}</span>
                                 `;
                                 div.addEventListener('click', () => {
-                                    searchInput.value = item.text;
-                                    suggestionsDiv.style.display = 'none';
-                                    searchInput.form.submit();
+                                    const searchInput = document.getElementById('searchInput');
+                                    if (searchInput) {
+                                        searchInput.value = item.text;
+                                        suggestionsDiv.style.display = 'none';
+                                        searchInput.form.submit();
+                                    }
                                 });
                                 suggestionsDiv.appendChild(div);
                             });
@@ -1042,8 +1086,21 @@
 
     // Initialize when the document is ready
     document.addEventListener('DOMContentLoaded', function() {
+        // Initialize field suggestions for all fields
         const fields = ['tags', 'colors', 'shapes', 'materials', 'textures'];
-        fields.forEach(field => setupFieldSuggestions(field));
+        fields.forEach(field => {
+            setupFieldSuggestions(field);
+            // Create suggestions container if it doesn't exist
+            const input = document.querySelector(`input[name="${field}"]`);
+            if (input) {
+                const container = input.closest('.categorized-input-container');
+                if (container && !container.querySelector('.field-suggestions')) {
+                    const suggestionsDiv = document.createElement('div');
+                    suggestionsDiv.className = 'field-suggestions';
+                    container.appendChild(suggestionsDiv);
+                }
+            }
+        });
     });
 
     // Add these utility functions

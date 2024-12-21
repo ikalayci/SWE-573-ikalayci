@@ -73,10 +73,24 @@ class Post(models.Model):
 
     def get_shapes_list(self):
         """Utility method to return shapes as a list."""
-        return self.shapes.split(',') if self.shapes else []
-    #def get_textures_list(self):
-    #    """Utility method to return textures as a list."""
-    #    return self.textures.split(', ') if self.textures else []
+        return [shape.strip() for shape in self.shapes.split(',')] if self.shapes else []
+
+    def get_textures_list(self):
+        """Utility method to return textures as a list."""
+        return [texture.strip() for texture in self.textures.split(',')] if self.textures else []
+
+    @property
+    def split_textures(self):
+        """Property to access textures as a list."""
+        return self.get_textures_list()
+
+    @split_textures.setter
+    def split_textures(self, value):
+        """Setter for textures that accepts either a list or a comma-separated string."""
+        if isinstance(value, list):
+            self.textures = ','.join(value)
+        else:
+            self.textures = value
 
     @property
     def time_period_display(self):

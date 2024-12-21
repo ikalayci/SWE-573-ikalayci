@@ -1556,7 +1556,7 @@
     function assignShapes() {
         const shapesContainer = document.getElementById('shapes-container');
         const checkboxes = document.querySelectorAll('input[name="shapes[]"]:checked');
-        const hiddenShapesInput = document.querySelector('input[name="shapes"]');
+        const hiddenShapesInput = document.getElementById('hidden-shapes');
 
         // Clear the existing buttons
         shapesContainer.innerHTML = '';
@@ -1605,7 +1605,7 @@
     function assignTextures() {
         const texturesContainer = document.getElementById('textures-container');
         const checkboxes = document.querySelectorAll('input[name="textures[]"]:checked');
-        const hiddenTexturesInput = document.querySelector('input[name="textures"]');
+        const hiddenTexturesInput = document.getElementById('hidden-textures');
 
         // Clear the existing buttons
         texturesContainer.innerHTML = '';

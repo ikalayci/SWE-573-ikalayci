@@ -10,6 +10,7 @@ from django.views.decorators.http import require_POST
 from accounts.models import Profile
 from django.core.validators import URLValidator
 from django.core.exceptions import ValidationError
+from django.contrib.auth.models import User
 
 
 
@@ -90,6 +91,22 @@ def create_post(request):
 
 def post_list(request):
     posts = Post.objects.all().order_by('-created_at')
+    
+    # Handle basic search
+    search_query = request.GET.get('search', '').strip()
+    if search_query:
+        posts = posts.filter(
+            Q(title__icontains=search_query) |
+            Q(content__icontains=search_query) |
+            Q(tags__name__icontains=search_query) |
+            Q(colors__icontains=search_query) |
+            Q(materials__icontains=search_query) |
+            Q(textures__icontains=search_query) |
+            Q(shapes__icontains=search_query) |
+            Q(time_period__icontains=search_query) |
+            Q(era__icontains=search_query) |
+            Q(user__username__icontains=search_query)
+        ).distinct()
     
     if request.GET.get('advanced_search'):
         # Handle categorized information filters
@@ -244,10 +261,14 @@ def post_list(request):
     for post in posts:
         post.split_colors = post.colors.split(',') if post.colors else []
         post.split_materials = post.materials.split(', ') if post.materials else []
-        post.split_textures = [texture.strip() for texture in post.textures.split(',')] if post.textures and post.textures.strip() else []
+        post.textures = ','.join([texture.strip() for texture in post.textures.split(',')] if post.textures and post.textures.strip() else [])
         post.user_profile_pic = post.user.profile.profile_picture if hasattr(post.user, 'profile') and post.user.profile.profile_picture else None
     
-    return render(request, 'posts/post_list.html', {'posts': posts})
+    context = {
+        'posts': posts,
+        'search_query': search_query  # Add search query to context
+    }
+    return render(request, 'posts/post_list.html', context)
 
 
 
@@ -281,11 +302,8 @@ def add_comment(request, post_id):
                         messages.error(request, 'Please enter a valid web link')
                         return redirect('posts:post_detail', post_id=post_id)
             
-            # Validate answer link
-            if comment_type == 'answer':
-                if not answer_link:
-                    messages.error(request, 'Web link is required for answers')
-                    return redirect('posts:post_detail', post_id=post_id)
+            # Validate answer link only if provided
+            if comment_type == 'answer' and answer_link:
                 try:
                     url_validator = URLValidator()
                     url_validator(answer_link)
@@ -365,7 +383,7 @@ def post_detail(request, post_id):
     # Process the same attributes as in post_list view
     post.split_colors = post.colors.split(',') if post.colors else []
     post.split_materials = post.materials.split(', ') if post.materials else []
-    post.split_textures = [texture.strip() for texture in post.textures.split(',')] if post.textures and post.textures.strip() else []
+    post.textures = ','.join([texture.strip() for texture in post.textures.split(',')] if post.textures and post.textures.strip() else [])
     post.user_profile_pic = post.user.profile.profile_picture if hasattr(post.user, 'profile') and post.user.profile.profile_picture else None
     
     return render(request, 'posts/post_detail.html', {'post': post})
@@ -376,11 +394,74 @@ def get_field_suggestions(request):
     query = request.GET.get('q', '').strip().lower()
     suggestions = []
     
-    if not field:
+    if not query:
         return JsonResponse({'suggestions': []})
     
     # Get unique values for the specified field
-    if field == 'tags':
+    if field == 'all':
+        # Search across all relevant fields
+        title_suggestions = Post.objects.filter(title__icontains=query).values_list('title', flat=True).distinct()[:2]
+        tag_suggestions = Tag.objects.filter(name__icontains=query).values_list('name', flat=True).distinct()[:2]
+        username_suggestions = User.objects.filter(username__icontains=query).values_list('username', flat=True).distinct()[:2]
+        
+        # Get suggestions from other fields
+        color_suggestions = []
+        material_suggestions = []
+        texture_suggestions = []
+        shape_suggestions = []
+        time_period_suggestions = []
+        era_suggestions = []
+        
+        for post in Post.objects.all():
+            # Colors
+            if post.colors:
+                colors = [c.strip() for c in post.colors.split(',')]
+                color_suggestions.extend([c for c in colors if query in c.lower()])
+            
+            # Materials
+            if post.materials:
+                materials = [m.strip() for m in post.materials.split(',')]
+                material_suggestions.extend([m for m in materials if query in m.lower()])
+            
+            # Textures
+            if post.textures:
+                textures = [t.strip() for t in post.textures.split(',')]
+                texture_suggestions.extend([t for t in textures if query in t.lower()])
+            
+            # Shapes
+            if post.shapes:
+                shapes = [s.strip() for s in post.shapes.split(',')]
+                shape_suggestions.extend([s for s in shapes if query in s.lower()])
+            
+            # Time Period
+            if post.time_period and query in post.time_period.lower():
+                time_period_suggestions.append(post.time_period)
+            
+            # Era
+            if post.era and query in post.era.lower():
+                era_suggestions.append(post.era)
+        
+        # Combine all suggestions and remove duplicates while preserving order
+        all_suggestions = []
+        seen = set()
+        for suggestion in (
+            list(title_suggestions) + 
+            list(username_suggestions) +
+            list(tag_suggestions) + 
+            list(set(color_suggestions)) + 
+            list(set(material_suggestions)) + 
+            list(set(texture_suggestions)) + 
+            list(set(shape_suggestions)) + 
+            list(set(time_period_suggestions)) + 
+            list(set(era_suggestions))
+        ):
+            if suggestion.lower() not in seen:
+                all_suggestions.append(suggestion)
+                seen.add(suggestion.lower())
+        
+        return JsonResponse({'suggestions': all_suggestions[:5]})
+    
+    elif field == 'tags':
         # For tags, search in the Tag model
         suggestions = list(Tag.objects.filter(
             name__icontains=query

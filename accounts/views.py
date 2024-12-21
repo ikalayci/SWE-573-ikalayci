@@ -111,28 +111,29 @@ def home(request):
 @csrf_exempt
 def profile_view(request, username=None):
     if username:
-        user = get_object_or_404(User, username=username)
+        profile_user = get_object_or_404(User, username=username)
     else:
-        user = request.user
+        profile_user = request.user
     
-    profile = user.profile
+    profile = get_object_or_404(Profile, user=profile_user)
     # Force update ranks before displaying
     profile.update_ranks()
     
     # Determine user type
-    if user.is_superuser or user.is_staff:
+    if profile_user.is_superuser or profile_user.is_staff:
         user_type = 'Admin'
     else:
         user_type = profile.user_type
     
     context = {
         'profile': profile,
-        'viewed_user': user,
-        'username': user.username,
-        'email': user.email,
+        'profile_user': profile_user,
+        'username': profile_user.username,
+        'email': profile_user.email,
         'profession': profile.profession,
         'bio': profile.bio,
-        'user_type': user_type,  # Use the determined user type
+        'user_type': user_type,
+        'is_own_profile': request.user == profile_user
     }
     return render(request, 'accounts/profile.html', context)
 
@@ -140,10 +141,18 @@ def user_profile(request, username):
     profile_user = get_object_or_404(User, username=username)
     profile = get_object_or_404(Profile, user=profile_user)
     
+    # Force update ranks before displaying
+    profile.update_ranks()
+    
     return render(request, 'accounts/profile.html', {
         'profile_user': profile_user,
         'profile': profile,
-        'is_own_profile': request.user == profile_user
+        'is_own_profile': request.user == profile_user,
+        'username': profile_user.username,
+        'email': profile_user.email,
+        'profession': profile.profession,
+        'bio': profile.bio,
+        'user_type': 'Admin' if profile_user.is_superuser or profile_user.is_staff else profile.user_type
     })
 
 def is_admin(user):
@@ -254,19 +263,7 @@ def delete_user(request, user_id):
         }, status=500)
 
 def profile(request):
-    profile = request.user.profile
-    
-    # Determine user type
-    if request.user.is_superuser or request.user.is_staff:
-        user_type = 'Admin'
-    else:
-        user_type = profile.user_type
-        
-    context = {
-        'profile': profile,
-        'user_type': user_type,  # Add this to context
-    }
-    return render(request, 'accounts/profile.html', context)
+    return profile_view(request)
 
 
 

@@ -1,5 +1,6 @@
 from django import forms
 from .models import Post, Tag
+import json
 
 
 class PostCreationForm(forms.ModelForm):
@@ -137,16 +138,35 @@ class PostCreationForm(forms.ModelForm):
             raise forms.ValidationError("Height cannot be negative.")
         return height
 
+    def clean(self):
+        cleaned_data = super().clean()
+        
+        # Get the shapes array from POST data
+        shapes_list = self.data.getlist('shapes[]')
+        if shapes_list:
+            cleaned_data['shapes'] = ','.join(shapes_list)
+        
+        # Get the textures array from POST data
+        textures_list = self.data.getlist('textures[]')
+        if textures_list:
+            cleaned_data['textures'] = ','.join(textures_list)
+        
+        return cleaned_data
+
     def save(self, commit=True, user=None):
         post = super().save(commit=False)
         if user:
             post.user = user
         if commit:
             post.save()
-            post.shapes = self.cleaned_data.get('shapes', '')
+            # Save shapes and textures
+            if 'shapes' in self.cleaned_data:
+                post.shapes = self.cleaned_data['shapes']
+            if 'textures' in self.cleaned_data:
+                post.textures = self.cleaned_data['textures']
             post.save()
-            #post.textures = self.cleaned_data.get('textures', '')  # Save textures
-            #post.save()
+            
+            # Handle tags
             tags_with_links_data = self.cleaned_data.get('tags_with_links', '[]')
             try:
                 tags = json.loads(tags_with_links_data)

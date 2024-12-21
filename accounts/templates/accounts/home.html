@@ -2,6 +2,20 @@
 <!-- login, register and logout buttons -->
 <h1>Welcome to My Django Project</h1>
 
+<form method="GET" action="{% url 'posts:post_list' %}" class="mb-4" id="searchForm">
+    <div class="input-group">
+        <input type="text" 
+               name="search" 
+               id="searchInput" 
+               class="form-control" 
+               placeholder="Search posts..." 
+               value="{{ request.GET.search }}"
+               autocomplete="off">
+        <div id="suggestions" class="dropdown-menu w-100" style="margin-top: -1px; display: none;"></div>
+        <button type="submit" class="btn btn-primary" id="searchButton">Search</button>
+    </div>
+</form>
+
 {% if user.is_authenticated %}
     <p>Hello, {{ user.username }}!</p>
     <a href="{% url 'logout' %}">Logout</a>
@@ -9,5 +23,85 @@
     <a href="{% url 'login' %}">Login</a>
     <a href="{% url 'register' %}">Register</a>
 {% endif %}
+
+<style>
+.dropdown-menu {
+    position: absolute;
+    z-index: 1000;
+    background-color: white;
+    border: 1px solid rgba(0,0,0,.15);
+    border-radius: 0.25rem;
+}
+
+.suggestion-item {
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+}
+
+.suggestion-item:hover {
+    background-color: #f8f9fa;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('searchInput');
+    const suggestionsDiv = document.getElementById('suggestions');
+    const searchForm = document.getElementById('searchForm');
+
+    // Set initial search value from URL if exists
+    const urlParams = new URLSearchParams(window.location.search);
+    const searchValue = urlParams.get('search');
+    if (searchValue) {
+        searchInput.value = decodeURIComponent(searchValue);
+    }
+
+    searchInput.addEventListener('input', function() {
+        const query = this.value.trim();
+        
+        if (query.length > 0) {
+            // Make API call to get suggestions
+            fetch(`/posts/field-suggestions/?field=all&q=${encodeURIComponent(query)}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.suggestions && data.suggestions.length > 0) {
+                        suggestionsDiv.innerHTML = '';
+                        data.suggestions.forEach(suggestion => {
+                            const div = document.createElement('div');
+                            div.className = 'suggestion-item';
+                            div.textContent = suggestion;
+                            div.addEventListener('click', function() {
+                                searchInput.value = suggestion;
+                                suggestionsDiv.style.display = 'none';
+                                searchForm.submit(); // Submit form when suggestion is clicked
+                            });
+                            suggestionsDiv.appendChild(div);
+                        });
+                        suggestionsDiv.style.display = 'block';
+                    } else {
+                        suggestionsDiv.style.display = 'none';
+                    }
+                });
+        } else {
+            suggestionsDiv.style.display = 'none';
+        }
+    });
+
+    // Hide suggestions when clicking outside
+    document.addEventListener('click', function(e) {
+        if (!searchInput.contains(e.target) && !suggestionsDiv.contains(e.target)) {
+            suggestionsDiv.style.display = 'none';
+        }
+    });
+
+    // Handle form submission
+    searchForm.addEventListener('submit', function(e) {
+        const searchValue = searchInput.value.trim();
+        if (!searchValue) {
+            e.preventDefault(); // Prevent empty submissions
+        }
+    });
+});
+</script>
 
 
